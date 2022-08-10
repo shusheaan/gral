@@ -1,0 +1,28 @@
+#!/bin/bash
+# rock_pi4_pios
+# start with clean install with desktop, then `echo 'exec i3' > ~/.xinitrc` and select boot to cli, then startx 
+
+sudo apt update
+sudo apt upgrade
+# sudo apt install net-tools network-manager # no nmcli, use sudo raspi-config
+sudo apt install ranger zsh curl git vim vim-gtk3 fzf htop xcape tmux ctags neofetch zip unzip
+sudo apt install python-pip build-essential cmake make gcc jupyter-notebook
+
+# sudo apt install xorg chromium # only for clean version
+sudo apt install i3 xfce4-terminal nautilus w3m scrot feh rofi
+# sudo apt install mpd pulseaudio # audio handling, with mpd seems like it's ok 
+# if audio not working again, ref: https://dbader.org/blog/crackle-free-audio-on-the-raspberry-pi-with-mpd-and-pulseaudio
+# sudo apt install fonts-dejavu fonts-firacode # hold your fire on font, use default if possible
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+chsh -s $(which zsh) # change default shell as zsh
+
+# oh my zsh plugins, will be called in .zshrc in dotfiles
+git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+# apply rock setup immediately after this and reboot
+
+mkdir -p ~/.config/autostart
+cp ./remap/xmodmap/xmodmap.desktop ~/.config/autostart
+

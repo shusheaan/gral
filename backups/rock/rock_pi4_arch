@@ -1,0 +1,22 @@
+#!/bin/bash
+# arch+i3 version for pi4
+
+sudo pacman -Syu
+sudo pacman -S ranger zsh curl git vim fzf htop xcape tmux ctags neofetch python-pip zip unzip cmake make gcc jupyter-notebook
+sudo pacman -S xorg-server xorg-xinit xorg-server-utils xf86-video-fbdev xorg-refresh i3-wm i3status
+sudo pacman -S chromium xfce4-terminal nautilus w3m lxappearance_obconf scrot compton feh rofi
+sudo pacman -S ttf-dejavu ttf-fira-mono noto-fonts-cjk # en and cn fonts, reboot after installing
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+chsh -s $(which zsh) # change default shell as zsh
+
+# oh my zsh plugins, will be called in .zshrc in dotfiles
+git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+# apply rock setup immediately after this and reboot
+
+# in vim :PluginInstall, python3 install ycmd server
+
+mkdir -p ~/.config/autostart
+cp ./remap/xmodmap/xmodmap.desktop ~/.config/autostart

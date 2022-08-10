@@ -1,0 +1,5 @@
+sudo apt update
+sudo apt install fuse libfuse3-dev bzip2 libbz2-dev cmake g++ 
+sudo apt install libattr1-dev zlib1g-dev cmake-curses-gui libboost-all-dev libbz2-dev
+sudo apt install dislocker libfuse-dev
+

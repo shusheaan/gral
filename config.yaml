@@ -1,0 +1,24 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ['~']
+
+- link:
+
+    ~/.vimrc: config/vimrc
+    ~/.zshrc: config/zshrc
+    ~/.xinitrc: config/xinitrc
+    ~/.tmux.conf: config/tmux.conf
+    ~/.config/lf/lfrc: config/lfrc
+    ~/.xmodmap.sh: config/xmodmap.sh
+    ~/.xmodmap.conf: config/xmodmap.conf
+    ~/.config/i3/config: config/i3.config
+    ~/.config/i3status/config: config/i3status.config
+    ~/.config/neofetch/config.conf: config/neofetch.conf
+    ~/.config/alacritty/alacritty.yml: config/alacritty.yml
+    ~/.oh-my-zsh/custom/themes/custom.zsh-theme: config/custom.zsh-theme
+
+- shell:
+  - [git submodule update --init --recursive, Installing submodules]

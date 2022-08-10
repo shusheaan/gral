@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=sh -c "~/.xmodmap.sh"
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=xmodmap
+Comment=xmodmap script
+

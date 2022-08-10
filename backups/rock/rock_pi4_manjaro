@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# manjaro kde version for pi4
+# lite version - essential toolbox
+
+sudo pacman -Syu
+sudo pacman -S ranger zsh curl git vim fzf htop xcape chromium tmux ctags neofetch python-pip w3m
+sudo pacman -S noto-fonts-cjk # chinese fonts, reboot after installing
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+chsh -s $(which zsh) # change default shell as zsh
+
+# in vim :PluginInstall, python3 install ycmd server
+
+mkdir -p ~/.config/autostart
+cp ./remap/xmodmap/xmodmap.desktop ~/.config/autostart
