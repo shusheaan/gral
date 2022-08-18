@@ -3,6 +3,7 @@ GRAL=$(pwd)
 ln -sf $GRAL/vim.conf $HOME/.vimrc
 ln -sf $GRAL/vim.conf $HOME/.config/nvim/init.vim
 ln -sf $GRAL/coc.conf $HOME/.vim/coc-settings.json
+ln -sf $GRAL/coc.conf $HOME/.config/nvim/coc-settings.json
 ln -sf $GRAL/zsh.conf $HOME/.zshrc
 ln -sf $GRAL/xinit.conf $HOME/.xinitrc
 ln -sf $GRAL/lf.conf $HOME/.config/lf/lfrc
