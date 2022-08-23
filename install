@@ -1,11 +1,11 @@
 #!/usr/bin/zsh
 GRAL=$(pwd)
-ln -sf $GRAL/vim.conf $HOME/.vimrc
-ln -sf $GRAL/vim.conf $HOME/.config/nvim/init.vim
-ln -sf $GRAL/coc.conf $HOME/.vim/coc-settings.json
-ln -sf $GRAL/coc.conf $HOME/.config/nvim/coc-settings.json
-ln -sf $GRAL/zsh.conf $HOME/.zshrc
-ln -sf $GRAL/xinit.conf $HOME/.xinitrc
+ln -sf $GRAL/vimrc $HOME/.vimrc
+ln -sf $GRAL/vimrc $HOME/.config/nvim/init.vim
+ln -sf $GRAL/coc.json $HOME/.vim/coc-settings.json
+ln -sf $GRAL/coc.json $HOME/.config/nvim/coc-settings.json
+ln -sf $GRAL/zshrc $HOME/.zshrc
+ln -sf $GRAL/xinitrc $HOME/.xinitrc
 ln -sf $GRAL/lf.conf $HOME/.config/lf/lfrc
 ln -sf $GRAL/tmux.conf $HOME/.tmux.conf
 ln -sf $GRAL/xmodmap.sh $HOME/.xmodmap.sh
@@ -14,5 +14,5 @@ ln -sf $GRAL/i3.conf $HOME/.config/i3/config
 ln -sf $GRAL/i3status.conf $HOME/.config/i3status/config
 ln -sf $GRAL/polybar.conf $HOME/.config/polybar/config.ini
 ln -sf $GRAL/neofetch.conf $HOME/.config/neofetch/config.conf
-ln -sf $GRAL/alacritty.conf $HOME/.config/alacritty/alacritty.yml
+ln -sf $GRAL/alacritty.yml $HOME/.config/alacritty/alacritty.yml
 ln -sf $GRAL/custom.zsh-theme $HOME/.oh-my-zsh/custom/themes/custom.zsh-theme
