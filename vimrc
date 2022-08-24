@@ -53,7 +53,7 @@ autocmd vimenter * colorscheme gruvbox
 set bg=dark
 
 " basics
-nnoremap rl :source $HOME/.vimrc<CR>
+nnoremap rl :source $HOME/.config/nvim/init.vim<CR>
 nnoremap gs :Git status<CR>
 nnoremap gl :diffget //3<CR>
 nnoremap gh :diffget //2<CR>

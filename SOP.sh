@@ -51,7 +51,7 @@ sudo pacman -S neofetch && neofetch # enjoy
 # rmdir nl whereis locate find chmod df du free ln diff date grep wc ps watch
 # sudo pacman -Q | less # explicitly installed pacman -Qe
 sudo pacman -S htop zsh fzf tmux zip unzip curl wget yarn alacritty base-devel clang gdb rustup julia coin-or-cbc
-sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip i3-wm polybar scrot ttf-dejavu cantarell-fonts
+sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip i3-wm polybar scrot ttf-dejavu cantarell-fonts wqy-zenhei
 sudo pacman -S exa bat ripgrep procs pulseaudio pulseaudio-alsa pulsemixer # pulseaudio-bluetooth
 
 # echo $SHELL # current # cat /etc/shells # installed shells
@@ -69,7 +69,9 @@ makepkg -si # provided by pacman, check content of PKGBUILD before this
 # deploy .files, in $HOME/repos
 git clone https://github.com/shusheaan/gral # under ~/repos, cd, and ./install 
 git config --global credential.helper store # store username and token (for repo)
-# deploy vimrc and :PlugInstall
+# may need to reset timezone again
+# deploy vimrc, install https://github.com/junegunn/vim-plug and :PlugInstall
+
 
 # rust + coc.nvim
 rustup default stable
