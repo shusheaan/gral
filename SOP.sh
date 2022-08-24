@@ -68,7 +68,7 @@ makepkg -si # provided by pacman, check content of PKGBUILD before this
 
 # deploy .files, in $HOME/repos
 git clone https://github.com/shusheaan/gral # under ~/repos, cd, and ./install 
-git config --global credential.helper store # store username and token (for repo)
+git config --global credential.helper store # store email, username, editor, and token (for repo)
 # may need to reset timezone again
 # deploy vimrc, install https://github.com/junegunn/vim-plug and :PlugInstall
 
