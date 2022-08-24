@@ -1,8 +1,8 @@
 font:
-  size: 7.5
+  size: 5.5
   offset:
     x: 0 # letter spacing
-    y: 2 # line spacing
+    y: 1 # line spacing
 
 shell:
   program: /usr/bin/zsh
@@ -13,8 +13,8 @@ shell:
 
 window:
   padding:
-    x: 7
-    y: 7
+    x: 3
+    y: 3
 
 colors:
   primary:
