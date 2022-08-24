@@ -50,7 +50,7 @@ sudo pacman -S neofetch && neofetch # enjoy
 # essentials
 # rmdir nl whereis locate find chmod df du free ln diff date grep wc ps watch
 # sudo pacman -Q | less # explicitly installed pacman -Qe
-sudo pacman -S htop zsh fzf tmux zip unzip curl wget yarn alacritty base-devel clang gdb rustup julia coin-or-cbc
+sudo pacman -S htop zsh fzf tmux zip unzip curl wget yarn alacritty base-devel cmake clang gdb rustup julia coin-or-cbc
 sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip i3-wm polybar scrot ttf-dejavu cantarell-fonts wqy-zenhei
 sudo pacman -S exa bat ripgrep procs pulseaudio pulseaudio-alsa pulsemixer # pulseaudio-bluetooth
 
