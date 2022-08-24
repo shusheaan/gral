@@ -91,6 +91,8 @@ nnoremap <leader>r :Rg<SPACE>
 nnoremap <leader>t :FloatermNew --autoclose=0 cargo test -- --nocapture<CR>
 nnoremap ct :FloatermNew --autoclose=0 cargo test -- --nocapture<CR>
 
+nnoremap <leader>p oprintln!("{:#?}, ")<ESC>hi
+
 " inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 " inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 " lnoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
