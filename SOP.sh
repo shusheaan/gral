@@ -16,15 +16,15 @@ lsblk # check mounting points and swap
 vim /etc/pacman.d/mirrorlist # check/edit mirrors
 pacman -Sy archlinux-keyring # package signiture issue, keyring pkg out-of-date
 # https://wiki.archlinux.org/title/Pacman/Package_signing#Upgrade_system_regularly
-pacstrap /mnt base linux linux-firmware sudo nvim git man-db man-pages tldr networkmanager
+pacstrap /mnt base linux linux-firmware sudo neovim git man-db man-pages tldr networkmanager
 genfstab -U /mnt >> /mnt/etc/fstab # use unique UUID
 arch-chroot /mnt # now in root dir as root
 timedatectl set-timezone America/New_York # timedatectl list-timezones; 
 hwclock --systohc # generate /etc/adjtime
-vim /etc/locale.gen # uncomment en_US.UTF-8 UTF-8
+nvim /etc/locale.gen # uncomment en_US.UTF-8 UTF-8
 locale-gen
-vim /etc/locale.conf # add LANG=en_US.UTF-8 
-vim /etc/hostname
+nvim /etc/locale.conf # add LANG=en_US.UTF-8
+nvim /etc/hostname
 passwd
 
 # grub, nmcli, and add sudo user
@@ -35,7 +35,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 useradd -m <username> && passwd <username> # --create-home
 # sudo -lU <username> # check sudo privilege
 usermod -aG wheel <username> # --append --groups 
-vim /etc/sudoers # uncomment %wheel ALL=(ALL) ALL
+nvim /etc/sudoers # uncomment %wheel ALL=(ALL) ALL
 exit # check pwd at /
 umount -R /mnt && reboot
 
@@ -51,9 +51,8 @@ sudo pacman -S neofetch && neofetch # enjoy
 # rmdir nl whereis locate find chmod df du free ln diff date grep wc ps watch
 # sudo pacman -Q | less # explicitly installed pacman -Qe
 sudo pacman -S htop zsh fzf tmux zip unzip curl wget yarn alacritty base-devel clang gdb rustup julia coin-or-cbc
-sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip i3-wm i3status polybar scrot ttf-dejavu cantarell-font
+sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip i3-wm polybar scrot ttf-dejavu cantarell-fonts
 sudo pacman -S exa bat ripgrep procs pulseaudio pulseaudio-alsa pulsemixer # pulseaudio-bluetooth
-vim ~/.xinitrc # add 'exec i3', TODO: add xmodmap script when it's inplace
 
 # echo $SHELL # current # cat /etc/shells # installed shells
 chsh -s /bin/zsh # zsh as default shell
@@ -61,13 +60,13 @@ wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - 
 git clone https://github.com/zsh-users/zsh-completions $ZSH_CUSTOM/plugins/zsh-completions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 
-# aur: chrome, lf
-git clone https://aur.archlinux.org/<pkg_name>.git && cd <pkg_name> # $HOME/builds
+# aur: chrome, lf, in $HOME/builds
+git clone https://aur.archlinux.org/<pkg_name>.git && cd <pkg_name>
 makepkg -si # provided by pacman, check content of PKGBUILD before this
 # if asking for dependencies, use -s/--syncdeps and check pkg list
 #   build, then sudo pacman -U <pkg_name>...zst to install
 
-# deploy .files
+# deploy .files, in $HOME/repos
 git clone https://github.com/shusheaan/gral # under ~/repos, cd, and ./install 
 git config --global credential.helper store # store username and token (for repo)
 # deploy vimrc and :PlugInstall
