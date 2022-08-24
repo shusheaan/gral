@@ -72,7 +72,6 @@ git config --global credential.helper store # store username and token (for repo
 # may need to reset timezone again
 # deploy vimrc, install https://github.com/junegunn/vim-plug and :PlugInstall
 
-
 # rust + coc.nvim
 rustup default stable
 rustup component add rust-analysis rust-src
