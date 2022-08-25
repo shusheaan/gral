@@ -77,6 +77,13 @@ rustup default stable
 rustup component add rust-analysis rust-src
 # :CocInstall coc-rust-analyzer # allow coc to install rust-analyzer
 
+# laptop hardware
+# scrolling backlight see section in polybar config file
+# trackpad:
+#   sudo nvim /usr/share/X11/xorg.conf.d/40-libinput.conf
+#   add Option "NaturalScrolling" "on"; Option "Tapping" "on";
+#   Option "TappingDrag" "on" to touchpad sections
+
 # steam
 sudo vim /etc/pacman.conf # comment out multilib section
 sudo pacman -Syu # update/sync 32bit database
