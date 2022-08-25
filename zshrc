@@ -120,6 +120,7 @@ alias kb='~/.xmodmap.sh'
 alias gc='google-chrome-stable'
 alias pm='pulsemixer'
 alias bt='bluetoothctl'
+alias sus='systemctl suspend'
 
 # fzf
 alias f='fo=`find . | fzf`'
