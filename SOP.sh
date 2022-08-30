@@ -43,6 +43,7 @@ umount -R /mnt && reboot
 sudo systemctl start NetworkManager.service # run status to check
 sudo systemctl enable NetworkManager.service # auto connect
 # nmcli device wifi list # show available wifi
+# `rfkill list` and `rfkill unblock ...` if `nmcli device` shows unavailable
 sudo nmcli device wifi connect <wifi_name> password <wifi_password> # ping
 sudo pacman -Syu
 sudo pacman -S neofetch && neofetch # enjoy
