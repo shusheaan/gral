@@ -10,6 +10,7 @@ fdisk -l # check table and partition types, p1 512M EFI, p2 8G swap (=RAM req by
 
 mkfs.ext4 /dev/<nv...p3> && mkswap /dev/<nv...p2> && mkfs.fat -F 32 /dev/<nv...p1>
 mount /dev/<nv...p3> /mnt && swapon /dev/<nv...p2> && mount --mkdir /dev/<nv...p1> /mnt/boot
+# debugging note: `sudo fsck /dev/<...>` to check file system in recovery mode if cannot boot
 lsblk # check mounting points and swap
 
 # installation and basic configs
