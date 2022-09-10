@@ -176,6 +176,7 @@ Plug 'JuliaEditorSupport/julia-vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ptzz/lf.vim'
 Plug 'voldikss/vim-floaterm'
+Plug 'chrisbra/csv.vim'
 
 call plug#end()
 " You can revert the settings after the call like so:
