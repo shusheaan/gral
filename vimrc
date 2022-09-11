@@ -117,10 +117,6 @@ function! CheckBackspace() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" csv
-cnoreabbrev csvarrange '<,'>ArrangeColumn
-cnoreabbrev csvsort '<,'>Sort 1
-
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
 " nmap <silent> [g <Plug>(coc-diagnostic-prev)
@@ -186,3 +182,11 @@ call plug#end()
 " You can revert the settings after the call like so:
 "   filetype indent off   " Disable file-type-specific indentation
 "   syntax off            " Disable syntax highlighting
+
+" csv
+aug CSV_Editing
+    au!
+    au BufRead,BufWritePost *.csv :%ArrangeColumn
+    au BufRead,BufWritePost *.csv :%Sort 1
+	au BufWritePre *.csv :%UnArrangeColumn
+aug end
