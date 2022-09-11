@@ -117,6 +117,10 @@ function! CheckBackspace() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
+" csv
+cnoreabbrev csvarrange '<,'>ArrangeColumn
+cnoreabbrev csvsort '<,'>Sort 1
+
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
 " nmap <silent> [g <Plug>(coc-diagnostic-prev)
