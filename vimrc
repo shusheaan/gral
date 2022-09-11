@@ -176,8 +176,17 @@ Plug 'JuliaEditorSupport/julia-vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ptzz/lf.vim'
 Plug 'voldikss/vim-floaterm'
+Plug 'chrisbra/csv.vim'
 
 call plug#end()
 " You can revert the settings after the call like so:
 "   filetype indent off   " Disable file-type-specific indentation
 "   syntax off            " Disable syntax highlighting
+
+" csv
+aug CSV_Editing
+    au!
+    au BufRead,BufWritePost *.csv :%ArrangeColumn
+    au BufRead,BufWritePost *.csv :%Sort 1
+	au BufWritePre *.csv :%UnArrangeColumn
+aug end

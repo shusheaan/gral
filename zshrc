@@ -122,12 +122,12 @@ alias pm='pulsemixer'
 alias bt='bluetoothctl'
 alias sus='systemctl suspend'
 
-# fzf
-alias f='fo=`find . | fzf`'
-alias ef='echo $fo'
-alias vf='nvim $fo' # dep: vf='nvim $(fzf)'
-alias cf='cd $fo' # dep: cf='cd $(find -type d | fzf)'
-export FZF_DEFAULT_OPTS="--layout=reverse --preview '(highlight -O ansi {} || cat {}) 2> /dev/null | head -500'"
+# fzf, dep, using fzf in lf
+# alias f='fo=`find . | fzf`'
+# alias ef='echo $fo'
+# alias vf='nvim $fo'
+# alias cf='cd $fo'
+# export FZF_DEFAULT_OPTS="--layout=reverse --preview '(highlight -O ansi {} || cat {}) 2> /dev/null | head -500'"
 
 # tmux
 alias tta='tmux attach -t'
