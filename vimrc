@@ -89,7 +89,9 @@ nnoremap <leader>o :browse oldfiles<CR>
 nnoremap <leader>u :UndotreeShow<CR>
 nnoremap <leader>r :Rg<SPACE>
 nnoremap <leader>t :FloatermNew --autoclose=0 cargo test -- --nocapture<CR>
-nnoremap <leader>p oprintln!("{:#?}", );<ESC>hi
+nnoremap <leader>e oerror!("{:#?}", );<ESC>hi
+nnoremap <leader>d odebug!("{:#?}", );<ESC>hi
+nnoremap <leader>i oinfo!("{:#?}", );<ESC>hi
 
 " inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
 " inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
