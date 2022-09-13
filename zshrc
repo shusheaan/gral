@@ -159,4 +159,4 @@ alias monitor-dual='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --o
 alias autoclick='xdotool click --repeat 600 --delay 60000 1'
 
 # cargo test
-alias ct='cargo test -- --nocapture | bat'
+alias ct='cargo test -- --nocapture | less'
