@@ -91,6 +91,7 @@ nnoremap <leader>r :Rg<SPACE>
 nnoremap <leader>t :FloatermNew --autoclose=0 cargo test -- --nocapture<CR>
 nnoremap <leader>e oerror!("{:#?}", );<ESC>hi
 nnoremap <leader>d odebug!("{:#?}", );<ESC>hi
+nnoremap <leader>p otrace!("{:#?}", );<ESC>hi
 nnoremap <leader>i oinfo!("{:#?}", );<ESC>hi
 
 " inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
