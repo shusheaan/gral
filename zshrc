@@ -153,10 +153,11 @@ alias lf=lfcd
 
 # dua-monitor setup
 alias monitor-single='xrandr --output HDMI1 --off'
+alias monitor-mini='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 2560x1440'
 alias monitor-dual='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 2560x0'
 
 # autoclick
 alias autoclick='xdotool click --repeat 600 --delay 60000 1'
 
 # cargo test
-alias ct='cargo test -- --nocapture | bat'
+alias ct='cargo test -- --nocapture | less'
