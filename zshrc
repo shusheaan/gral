@@ -161,3 +161,6 @@ alias autoclick='xdotool click --repeat 600 --delay 60000 1'
 
 # cargo test
 alias ct='cargo test -- --nocapture | less'
+
+# julia
+alias jl='julia --project=.'
