@@ -13,6 +13,7 @@ ln -sf $GRAL/coc.json $HOME/.config/nvim/coc-settings.json
 
 mkdir -p $HOME/.config/lf
 ln -sf $GRAL/lf.conf $HOME/.config/lf/lfrc
+ln -sf $GRAL/lfpv.sh $HOME/.config/lf/preview.sh
 
 mkdir -p $HOME/.config/i3
 ln -sf $GRAL/i3.conf $HOME/.config/i3/config
