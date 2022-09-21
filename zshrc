@@ -161,6 +161,7 @@ alias autoclick='xdotool click --repeat 600 --delay 60000 1'
 
 # cargo test
 alias ct='cargo test -- --nocapture | less'
+alias cb='cargo build && rust-gdb $PWD/target/debug/$(basename "$PWD") --silent'
 
 # julia
 alias jl='julia --project=.'
