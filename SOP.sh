@@ -95,3 +95,9 @@ sudo systemctl start bluetooth.service && sudo systemctl enable bluetooth.servic
 sudo vim /etc/bluetooth/main.conf # AutoEnable=true and DiscoverableTimeout=0
 git clone https://github.com/atar-axis/xpadneo.git && cd xpadneo
 sudo ./install.sh # with dkms, then bluetoothctl
+
+# alsa, midi
+# https://wiki.archlinux.org/title/USB_MIDI_keyboards
+sudo pacman -S alsa-utils usbutils # then restart to enable /dev/snd/seq
+sudo gpasswd -a <username> audio # groups <username>
+# aseqdump # all set for midir
