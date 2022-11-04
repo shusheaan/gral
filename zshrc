@@ -165,3 +165,6 @@ alias cb='cargo build && rust-gdb $PWD/target/debug/$(basename "$PWD") --silent'
 
 # julia
 alias jl='julia --project=.'
+
+# cmatrix
+alias cm='cmatrix -C cyan'
