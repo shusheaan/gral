@@ -168,3 +168,6 @@ alias jl='julia --project=.'
 
 # cmatrix
 alias cm='cmatrix -C cyan'
+
+# utrp
+alias utrp='~/downloads/utrp'
