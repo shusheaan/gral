@@ -101,3 +101,9 @@ sudo ./install.sh # with dkms, then bluetoothctl
 sudo pacman -S alsa-utils usbutils # then restart to enable /dev/snd/seq
 sudo gpasswd -a <username> audio # groups <username>
 # aseqdump # all set for midir
+
+# citrix and zoom
+# https://wiki.archlinux.org/title/citrix, walk thru installation steps
+# https://wiki.archlinux.org/title/Zoom_Meetings, external usb mic req
+# make sure firefox is installed, open the .ica file on chrome or xdg-open it
+# firefox will be launched for the client but can be closed once the client is running
