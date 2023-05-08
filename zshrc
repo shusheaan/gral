@@ -176,3 +176,6 @@ alias utrp='~/downloads/utrp'
 # mute/unmute
 alias mute='amixer set Capture nocap'
 alias unmute='amixer set Capture cap'
+
+# citrix
+alias citrix='/opt/Citrix/ICAClient/wfica'
