@@ -172,3 +172,7 @@ alias cm='cmatrix -C cyan'
 
 # utrp
 alias utrp='~/downloads/utrp'
+
+# mute/unmute
+alias mute='amixer set Capture nocap'
+alias unmute='amixer set Capture cap'
