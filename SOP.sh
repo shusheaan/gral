@@ -73,6 +73,7 @@ git clone https://github.com/shusheaan/gral # under ~/repos, cd, and ./install
 git config --global credential.helper store # store email, username, editor, and token (for repo)
 # may need to reset timezone again
 # deploy vimrc, install https://github.com/junegunn/vim-plug and :PlugInstall
+timedatectl set-ntp true # sync time
 
 # rust + coc.nvim
 rustup default stable
