@@ -113,6 +113,7 @@ export LANG=en_US.UTF-8
 # gurobi
 export GUROBI_HOME="/opt/gurobi1001/linux64"
 export PATH="${PATH}:${GUROBI_HOME}/bin"
+export LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
 
 # sys
