@@ -88,7 +88,7 @@ nmap <leader>. :res +20<CR>
 nnoremap <leader>o :browse oldfiles<CR>
 nnoremap <leader>u :UndotreeShow<CR>
 nnoremap <leader>r :Rg<SPACE>
-nnoremap <leader>t :FloatermNew --autoclose=0 cargo test -- --nocapture<CR>
+nnoremap <leader>t :FloatermNew --autoclose=0 cargo test -- --nocapture > log<CR>
 nnoremap <leader>b :FloatermNew --autoclose=1 cargo build && cargo run<CR>
 nnoremap <leader>e oerror!("{:#?}", );<ESC>hi
 nnoremap <leader>d odebug!("{:#?}", );<ESC>hi
