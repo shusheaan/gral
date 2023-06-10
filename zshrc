@@ -158,11 +158,12 @@ lfcd () {
 alias lf=lfcd
 
 # dua-monitor setup
-alias monitor-single='xrandr --output HDMI1 --off'
-alias monitor-mini='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 2560x1440'
-alias monitor-game='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 1280x720'
+# alias monitor-single='xrandr --output HDMI1 --off'
+# alias monitor-mini='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 2560x1440'
+# alias monitor-game='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 1280x720'
 alias monitor-dual='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 2560x0'
 alias monitor-dm='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 2560x1440 --pos 2560x0'
+alias monitor-da='xrandr --output HDMI1 --rotate left --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 1440x150'
 
 # autoclick
 alias clk='xdotool click --repeat 600 --delay 60000 1'
