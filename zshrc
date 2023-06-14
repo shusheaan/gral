@@ -157,13 +157,14 @@ lfcd () {
 }
 alias lf=lfcd
 
-# dua-monitor setup
+# dual-monitor setup
 # alias monitor-single='xrandr --output HDMI1 --off'
 # alias monitor-mini='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 2560x1440'
 # alias monitor-game='xrandr --output HDMI1 --off; xrandr --output DP1 --mode 1280x720'
-alias monitor-dual='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 2560x0'
-alias monitor-dm='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 2560x1440 --pos 2560x0'
-alias monitor-da='xrandr --output HDMI1 --rotate left --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 1440x150'
+# alias monitor-dual='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 2560x0'
+# alias monitor-dm='xrandr --output HDMI1 --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 2560x1440 --pos 2560x0'
+alias monitor-dalt='xrandr --output HDMI1 --rotate left --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 3840x2160 --pos 1440x150'
+alias monitor-dam='xrandr --output HDMI1 --rotate left --mode 2560x1440 --pos 0x0; xrandr --output DP1 --mode 2560x1440 --pos 1440x300'
 
 # autoclick
 alias clk='xdotool click --repeat 600 --delay 60000 1'
@@ -188,3 +189,7 @@ alias unmute='amixer set Capture cap'
 
 # citrix
 alias citrix='/opt/Citrix/ICAClient/wfica'
+
+# influx db token
+export INFLUXDB_TOKEN=s4pUaWzvwLeU1L0TF7EtvQuUwc16Y4voU8X4GQcrFo4f0CCdtRBhBzMKnpJROj0AdStJW7jmYN6g67xsC72OTg==
+
