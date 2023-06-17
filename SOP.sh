@@ -1,3 +1,7 @@
+# 2023-06-16: boot stuck at /dev/... ...files, ...blocks
+#   in the boot menu, select fallback initramfs, boot and login successfully
+#   after that the normal boot and login works
+
 # boot from flash disk as root@archiso
 iwctl # iwd for wifi, ping to check
 timedatectl set-ntp true # timedatectl status
