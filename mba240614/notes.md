@@ -12,7 +12,7 @@
 
 - Terminal tuning in vscode, dotfiles from gral
     - homebrew (xcode, run two lines after install to add homebrew PATH)
-    - brew install htop, fzf, lf, nvim, node; ohmyzsh install
+    - brew install htop, fzf, lf, nvim, node, watch, cliclick; ohmyzsh install
     - code: install code command to PATH, update lfrc to use code to open files
     - `lf.conf -> ~/.config/lf/lfrc`, manual adjust columns and disable preview, use default preview
     - `zshrc -> ~/.zshrc`
@@ -29,3 +29,4 @@
         - `custom.zsh-theme > ~/.oh-my-zsh/custom/themes/custom.zsh-theme`
     - using `TERM=xterm-256color` to avoid printing the command
     - remove specifying zsh history path in `zshrc` to avoid error while quitting
+    - attaching old vimrc and zshrc from old mba on 06-14 for reference
