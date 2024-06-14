@@ -1,0 +1,31 @@
+### MacBook Setup, 2024-06-14
+
+- General: Wifi, Apple id, fastest trackpad, display more space, wallpaper, dock, menu, trackpad drag, system upgrade, reduce transparency, require password immediately, no adjust brightness auto, hot corners shortcuts
+- Finder: side bar (airdrop, desktop, down, icloud doc, icloud drive), documents when open, toolbar (search view bf), global text size, 12pt, input source
+- citrix, zoom, wechat, chrome, vscode (github sync)
+- Karabiner:
+    - global left: option, command, control
+    - capslock enhancements (gral, karabiner/karabiner.json)
+    - settings > keyboard > app shortcuts
+        - chrome: find, new tab, enter/exit full screen, open file, reload, new window, close tab, open location
+        - finder: new window, close window, full screen
+
+- Terminal tuning in vscode, dotfiles from gral
+    - homebrew (xcode, run two lines after install to add homebrew PATH)
+    - brew install htop, fzf, lf, nvim, node; ohmyzsh install
+    - code: install code command to PATH, update lfrc to use code to open files
+    - `lf.conf -> ~/.config/lf/lfrc`, manual adjust columns and disable preview, use default preview
+    - `zshrc -> ~/.zshrc`
+    - vim/nvim
+        - `vimrc -> ~/.vimrc`
+        - `vimrc -> ~/.config/nvim/init.vim`
+        - install https://github.com/junegunn/vim-plug and :PlugInstall, for both vim and nvim
+    - zsh plugins: oh-my-zsh themes
+        - `wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh # sammy`
+        - `git clone https://github.com/zsh-users/zsh-completions $ZSH_CUSTOM/plugins/zsh-completions`
+        - `git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting`
+    - zsh themes:
+        - `mkdir -p ~/.oh-my-zsh/custom/themes`
+        - `custom.zsh-theme > ~/.oh-my-zsh/custom/themes/custom.zsh-theme`
+    - using `TERM=xterm-256color` to avoid printing the command
+    - remove specifying zsh history path in `zshrc` to avoid error while quitting
