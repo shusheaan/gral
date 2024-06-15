@@ -24,6 +24,7 @@
         - `wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh # sammy`
         - `git clone https://github.com/zsh-users/zsh-completions $ZSH_CUSTOM/plugins/zsh-completions`
         - `git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting`
+        - `git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions`
     - zsh themes:
         - `mkdir -p ~/.oh-my-zsh/custom/themes`
         - `custom.zsh-theme > ~/.oh-my-zsh/custom/themes/custom.zsh-theme`
