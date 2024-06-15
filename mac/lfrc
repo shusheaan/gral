@@ -5,7 +5,7 @@ set dircounts
 set hidden
 set number
 set relativenumber
-set ratios 2:3:5
+set ratios 2:3:4
 
 # ranger legacy commands
 map J push 7j

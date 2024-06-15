@@ -1,0 +1,12 @@
+GRAL=$(pwd)
+
+ln -sf $GRAL/zshrc $HOME/.zshrc
+mkdir -p ~/.oh-my-zsh/custom/themes
+ln -sf $GRAL/custom.zsh-theme $HOME/.oh-my-zsh/custom/themes/custom.zsh-theme
+
+mkdir -p $HOME/.config/nvim
+ln -sf $GRAL/vimrc $HOME/.vimrc
+ln -sf $GRAL/vimrc $HOME/.config/nvim/init.vim
+
+mkdir -p $HOME/.config/lf
+ln -sf $GRAL/lfrc $HOME/.config/lf/lfrc
