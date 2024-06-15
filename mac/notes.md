@@ -26,11 +26,3 @@
     ```
     - install `https://github.com/junegunn/vim-plug` and `:PlugInstall`, for both vim and nvim
     - setup `git config user.name; git config user.email` to match github profile
-
-- (optional) rust/rust-analyzer in vscode
-```
-# rust + coc.nvim
-rustup default stable
-rustup component add rust-analysis rust-src
-# :CocInstall coc-rust-analyzer # allow coc to install rust-analyzer
-```
