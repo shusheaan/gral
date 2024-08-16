@@ -26,3 +26,4 @@
     ```
     - install `https://github.com/junegunn/vim-plug` and `:PlugInstall`, for both vim and nvim
     - setup `git config user.name; git config user.email` to match github profile
+    - Rust/UTRP: `https://www.rust-lang.org/tools/install`, git clone repo and `cargo build`
