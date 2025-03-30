@@ -112,10 +112,11 @@ export LANG=en_US.UTF-8
 # fi
 
 # gurobi
-export GUROBI_HOME="/opt/gurobi1001/linux64"
-export PATH="${PATH}:${GUROBI_HOME}/bin"
-export LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
+export GUROBI_HOME="/Library/gurobi1201/macos_universal2"
+export PATH="${GUROBI_HOME}/bin:${PATH}"
+export DYLD_LIBRARY_PATH="${GUROBI_HOME}/lib:${DYLD_LIBRARY_PATH}"
+export CPATH="${GUROBI_HOME}/include:${CPATH}"
+export LIBRARY_PATH="${GUROBI_HOME}/lib:${LIBRARY_PATH}"
 
 # sys
 alias yo='sudo pacman -Syu && neofetch'
@@ -172,6 +173,7 @@ alias qclk='xdotool click --repeat 600 --delay 5000 1'
 # cargo test
 alias ct='cargo test -- --nocapture | less'
 alias cb='cargo build && rust-gdb $PWD/target/debug/$(basename "$PWD") --silent'
+export RUST_BACKTRACE=full
 
 # julia
 alias jl='julia --project=.'
