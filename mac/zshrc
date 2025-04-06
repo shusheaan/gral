@@ -118,6 +118,12 @@ export DYLD_LIBRARY_PATH="${GUROBI_HOME}/lib:${DYLD_LIBRARY_PATH}"
 export CPATH="${GUROBI_HOME}/include:${CPATH}"
 export LIBRARY_PATH="${GUROBI_HOME}/lib:${LIBRARY_PATH}"
 
+# tch-rs
+export LIBTORCH="/Users/shushean/libtorch"
+# export DYLD_LIBRARY_PATH="${LIBTORCH}/lib:${DYLD_LIBRARY_PATH}" # segmentation fault for pytest
+# export LIBTORCH_USE_PYTORCH=1
+# export LIBTORCH_BYPASS_VERSION_CHECK=1
+
 # sys
 alias yo='sudo pacman -Syu && neofetch'
 alias fl='fdisk -l'
@@ -171,7 +177,7 @@ alias clk='xdotool click --repeat 600 --delay 60000 1'
 alias qclk='xdotool click --repeat 600 --delay 5000 1'
 
 # cargo test
-alias ct='cargo test -- --nocapture | less'
+alias ct='cargo test -- --nocapture'
 alias cb='cargo build && rust-gdb $PWD/target/debug/$(basename "$PWD") --silent'
 export RUST_BACKTRACE=full
 
