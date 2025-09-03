@@ -205,3 +205,4 @@ alias qclk='watch -n 5 cliclick c:1000,500'
 export INFLUXDB_TOKEN=s4pUaWzvwLeU1L0TF7EtvQuUwc16Y4voU8X4GQcrFo4f0CCdtRBhBzMKnpJROj0AdStJW7jmYN6g67xsC72OTg==
 
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
