@@ -1,11 +1,8 @@
 #!/usr/bin/zsh
 GRAL=$(pwd)
 
-ln -sf $GRAL/zshrc $HOME/.zshrc
-ln -sf $GRAL/xinitrc $HOME/.xinitrc
+ln -sf $GRAL/zshrc_pod $HOME/.zshrc
 ln -sf $GRAL/tmux.conf $HOME/.tmux.conf
-ln -sf $GRAL/xmodmap.sh $HOME/.xmodmap.sh
-ln -sf $GRAL/xmodmap.conf $HOME/.xmodmap.conf
 
 mkdir -p $HOME/.config/nvim
 ln -sf $GRAL/vimrc $HOME/.config/nvim/init.vim

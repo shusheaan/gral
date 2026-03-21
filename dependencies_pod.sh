@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# pod only home dir override
+export HOME=/workspace
+export ZDOTDIR=/workspace
+export XDG_CONFIG_HOME=/workspace/.config
+export XDG_CACHE_HOME=/workspace/.cache
+export XDG_DATA_HOME=/workspace/.local/share
+export XDG_STATE_HOME=/workspace/.local/state
+
 if [ "$(id -u)" -eq 0 ]; then
   SUDO=""
 else
@@ -59,6 +67,38 @@ else
   warn "watch not found"
 fi
 
+# install omz
+log "Installing Oh My Zsh if needed..."
+if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+sh -c "$(curl -fsSL "$OMZ_INSTALL_URL")" "" --unattended
+ok "Oh My Zsh installed"
+else
+ok "Oh My Zsh already installed"
+fi
+
+local zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+mkdir -p "$zsh_custom/plugins"
+
+clone_or_update_plugin \
+"https://github.com/zsh-users/zsh-completions" \
+"$zsh_custom/plugins/zsh-completions"
+
+clone_or_update_plugin \
+"https://github.com/zsh-users/zsh-syntax-highlighting.git" \
+"$zsh_custom/plugins/zsh-syntax-highlighting"
+
+clone_or_update_plugin \
+"https://github.com/zsh-users/zsh-autosuggestions.git" \
+"$zsh_custom/plugins/zsh-autosuggestions"
+
+if [[ ! -f "$HOME/.zshrc" && -f "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" ]]; then
+cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" "$HOME/.zshrc"
+ok "Created ~/.zshrc from Oh My Zsh template"
+fi
+
+replace_or_append_plugins_line "$HOME/.zshrc"
+
+# rustup
 log "Installing rustup"
 if ! command -v rustup >/dev/null 2>&1; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
