@@ -9,14 +9,19 @@ export XDG_CACHE_HOME=/workspace/.cache
 export XDG_DATA_HOME=/workspace/.local/share
 export XDG_STATE_HOME=/workspace/.local/state
 
+OMZ_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+
+
 if [ "$(id -u)" -eq 0 ]; then
   SUDO=""
 else
   SUDO="sudo"
 fi
 
-log()  { printf '\n\033[1;34m[INFO]\033[0m %s\n' "$*"; }
-warn() { printf '\n\033[1;33m[WARN]\033[0m %s\n' "$*"; }
+log()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
+ok()   { printf '\033[1;32m[ok]\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m[warn]\033[0m %s\n' "$*"; }
+err()  { printf '\033[1;31m[err]\033[0m %s\n' "$*" >&2; }
 
 VENV_DIR="/workspace/.venvs/gnn"
 
