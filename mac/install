@@ -10,3 +10,4 @@ ln -sf $GRAL/vimrc $HOME/.config/nvim/init.vim
 
 mkdir -p $HOME/.config/lf
 ln -sf $GRAL/lfrc $HOME/.config/lf/lfrc
+ln -sf $GRAL/pv.sh $HOME/.config/lf/pv.sh

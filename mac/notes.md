@@ -1,5 +1,17 @@
 ### MacBook Setup
-2024-06-14, minimal, essentials and lf/vim/zsh rcs
+
+#### 2026-03-21
+fresh tahoe install and cloud infra docker setup
+
+- macos personal settings, karabiner json and functional keys remap, app shortcuts, vscode acct sync
+- homebrew and basic tools $chmod +x dependencies.sh; ./dependencies.sh$, then ./install gral dotfile links
+- nvim vim-plug: $curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim$ then $:PlugInstall$
+- lf syntax highlight in preview, updated in lfrc and pv.sh (chmod req)
+
+
+#### 2024-06-14
+minimal, essentials and lf/vim/zsh rcs
 
 - General: Wifi, Apple id, fastest trackpad, display more space, wallpaper, dock, menu, trackpad drag, system upgrade, reduce transparency, require password immediately, no adjust brightness auto, hot corners shortcuts, use icloud to sync files so ~/Documents is icloud drive, github repos in a separate folder under home
 - Finder: side bar (airdrop, desktop, down, icloud doc, icloud drive), documents when open, toolbar (search view bf), global text size, 12pt, input source
@@ -11,7 +23,6 @@
         - chrome: find, new tab, enter/exit full screen, open file, reload, new window, close tab, open location
         - finder: new window, close window, full screen
         - vscode all synced via github, terminal left, 1/3 screen
-
 - Terminal tuning in vscode, dotfiles from gral
     - homebrew (xcode, run two lines after install to add homebrew PATH)
     - brew install htop, fzf, lf, nvim, node, watch, cliclick; oh-my-zsh install
@@ -26,4 +37,3 @@
     ```
     - install `https://github.com/junegunn/vim-plug` and `:PlugInstall`, for both vim and nvim
     - setup `git config user.name; git config user.email` to match github profile
-    - Rust/UTRP: `https://www.rust-lang.org/tools/install`, git clone repo and `cargo build`

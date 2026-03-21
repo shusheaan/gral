@@ -157,3 +157,6 @@ cmd tags ${{
     lf -remote "send $id $cmd \"$res\""
 }}
 map T tags
+
+set preview true
+set previewer ~/.config/lf/pv.sh
