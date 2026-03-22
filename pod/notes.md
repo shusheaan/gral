@@ -1,4 +1,4 @@
-### dev ready
+### pod setup
 
 - pod torch 280 + ubuntu 24 + cuda 1281, template
 - manual config process:
@@ -8,7 +8,7 @@
     - check builder with $docker buildx ls$
     - create cloud builder ins: $docker buildx create --driver cloud shuswg/pod$
     - build: $docker buildx build --builder cloud-shuswg-pod --platform linux/amd64 -t shuswg/pod:latest --push ./pod$
-    - create template in runpod pointing to $shuswg/pod:latest$
+    - create template in runpod pointing to $shuswg/pod:latest$, tcp port 22, ip auto assigned
     - check storage $docker buildx du --builder cloud-shuswg-pod$ 
     - clear cloud cache $docker buildx prune --builder cloud-shuswg-pod --all --force$
     - lf req ubuntu lts 24+
