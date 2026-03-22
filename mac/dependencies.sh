@@ -20,6 +20,7 @@ BREW_PACKAGES=(
   eza
   jq
   poppler
+  typst
 )
 
 OMZ_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"

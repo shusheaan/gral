@@ -1,0 +1,57 @@
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+
+WORKDIR /workspace
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CARGO_HOME=/root/.cargo
+ENV RUSTUP_HOME=/root/.rustup
+ENV PATH=/root/.cargo/bin:$PATH
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    bat \
+    build-essential \
+    ca-certificates \
+    cmake \
+    curl \
+    fd-find \
+    file \
+    fzf \
+    git \
+    htop \
+    jq \
+    less \
+    # lf \
+    neovim \
+    nodejs \
+    npm \
+    pkg-config \
+    procps \
+    ripgrep \
+    tar \
+    tmux \
+    tree \
+    unzip \
+    wget \
+    xz-utils \
+    zip \
+    zsh \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache-dir torch_geometric==2.6.1 && \
+    python3 -m pip install --no-cache-dir \
+      pyg_lib \
+      torch_scatter \
+      torch_sparse \
+      torch_cluster \
+      --find-links https://data.pyg.org/whl/torch-2.4.0+cu124.html
+
+ARG RUST_TOOLCHAIN=stable
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+    sh -s -- -y --no-modify-path --profile minimal --default-toolchain ${RUST_TOOLCHAIN} && \
+    rustup default ${RUST_TOOLCHAIN} && \
+    rustup component add rustfmt clippy rust-src rust-analyzer
+
+RUN python3 -c "import torch; import torch_geometric; print(torch.__version__); print(torch.version.cuda); print(torch_geometric.__version__)" && \
+    rustc --version && cargo --version && rustup --version

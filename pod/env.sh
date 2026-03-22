@@ -15,78 +15,6 @@ ok()   { printf '\033[1;32m[ok]\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[warn]\033[0m %s\n' "$*"; }
 err()  { printf '\033[1;31m[err]\033[0m %s\n' "$*" >&2; }
 
-clone_or_update_plugin() {
-  local repo_url="$1"
-  local target_dir="$2"
-
-  if [[ -d "$target_dir/.git" ]]; then
-    log "Updating plugin: $target_dir"
-    git -C "$target_dir" pull --ff-only
-  else
-    log "Cloning plugin: $repo_url"
-    git clone --depth=1 "$repo_url" "$target_dir"
-  fi
-}
-
-replace_or_append_plugins_line() {
-  local zshrc="$1"
-  local plugins_line='plugins=(git zsh-completions zsh-syntax-highlighting zsh-autosuggestions)'
-
-  touch "$zshrc"
-
-  if grep -qE '^[[:space:]]*plugins=' "$zshrc"; then
-    sed -i -E "s|^[[:space:]]*plugins=.*|$plugins_line|" "$zshrc"
-    ok "Patched plugins line in $zshrc"
-  else
-    {
-      printf '\n# Plugins managed by dependencies_pod_fixed.sh\n'
-      printf '%s\n' "$plugins_line"
-    } >> "$zshrc"
-    ok "Added plugins line to $zshrc"
-  fi
-}
-
-append_line_if_missing() {
-  local file="$1"
-  local line="$2"
-  touch "$file"
-  grep -Fqs "$line" "$file" || printf '%s\n' "$line" >> "$file"
-}
-
-install_oh_my_zsh() {
-  log "Installing Oh My Zsh if needed..."
-
-  if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
-    RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL "$OMZ_INSTALL_URL")"
-    ok "Oh My Zsh installed"
-  else
-    ok "Oh My Zsh already installed"
-  fi
-
-  local zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-  mkdir -p "$zsh_custom/plugins"
-
-  clone_or_update_plugin \
-    "https://github.com/zsh-users/zsh-completions" \
-    "$zsh_custom/plugins/zsh-completions"
-
-  clone_or_update_plugin \
-    "https://github.com/zsh-users/zsh-syntax-highlighting.git" \
-    "$zsh_custom/plugins/zsh-syntax-highlighting"
-
-  clone_or_update_plugin \
-    "https://github.com/zsh-users/zsh-autosuggestions.git" \
-    "$zsh_custom/plugins/zsh-autosuggestions"
-
-  if [[ ! -f "$HOME/.zshrc" && -f "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" ]]; then
-    cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" "$HOME/.zshrc"
-    ok "Created ~/.zshrc from Oh My Zsh template"
-  fi
-
-  replace_or_append_plugins_line "$HOME/.zshrc"
-  append_line_if_missing "$HOME/.zshrc" 'export PATH="$HOME/.cargo/bin:$PATH"'
-  append_line_if_missing "$HOME/.zshrc" 'alias vim="nvim"'
-}
 
 install_rust() {
   log "Installing rustup if needed"
@@ -120,7 +48,7 @@ install_rust() {
 
 install_python_stack() {
   log "Creating venv with system site-packages at ${VENV_DIR}"
-  mkdir -p /workspace/.venvs
+  mkdir -p "${VENV_DIR}"
   python3 -m venv --system-site-packages "${VENV_DIR}"
 
   # shellcheck disable=SC1091
@@ -186,6 +114,81 @@ print("torch_geometric.__version__ =", torch_geometric.__version__)
 PY
 }
 
+
+replace_or_append_plugins_line() {
+  local zshrc="$1"
+  local plugins_line='plugins=(git zsh-completions zsh-syntax-highlighting zsh-autosuggestions)'
+
+  touch "$zshrc"
+
+  if grep -qE '^[[:space:]]*plugins=' "$zshrc"; then
+    sed -i -E "s|^[[:space:]]*plugins=.*|$plugins_line|" "$zshrc"
+    ok "Patched plugins line in $zshrc"
+  else
+    {
+      printf '\n# Plugins managed by dependencies_pod_fixed.sh\n'
+      printf '%s\n' "$plugins_line"
+    } >> "$zshrc"
+    ok "Added plugins line to $zshrc"
+  fi
+}
+
+append_line_if_missing() {
+  local file="$1"
+  local line="$2"
+  touch "$file"
+  grep -Fqs "$line" "$file" || printf '%s\n' "$line" >> "$file"
+}
+
+clone_or_update_plugin() {
+  local repo_url="$1"
+  local target_dir="$2"
+
+  if [[ -d "$target_dir/.git" ]]; then
+    log "Updating plugin: $target_dir"
+    git -C "$target_dir" pull --ff-only
+  else
+    log "Cloning plugin: $repo_url"
+    git clone --depth=1 "$repo_url" "$target_dir"
+  fi
+}
+
+install_oh_my_zsh() {
+  log "Installing Oh My Zsh if needed..."
+
+  if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+    RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL "$OMZ_INSTALL_URL")"
+    ok "Oh My Zsh installed"
+  else
+    ok "Oh My Zsh already installed"
+  fi
+
+  local zsh_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+  mkdir -p "$zsh_custom/plugins"
+
+  clone_or_update_plugin \
+    "https://github.com/zsh-users/zsh-completions" \
+    "$zsh_custom/plugins/zsh-completions"
+
+  clone_or_update_plugin \
+    "https://github.com/zsh-users/zsh-syntax-highlighting.git" \
+    "$zsh_custom/plugins/zsh-syntax-highlighting"
+
+  clone_or_update_plugin \
+    "https://github.com/zsh-users/zsh-autosuggestions.git" \
+    "$zsh_custom/plugins/zsh-autosuggestions"
+
+  if [[ ! -f "$HOME/.zshrc" && -f "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" ]]; then
+    cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" "$HOME/.zshrc"
+    ok "Created ~/.zshrc from Oh My Zsh template"
+  fi
+
+  replace_or_append_plugins_line "$HOME/.zshrc"
+  append_line_if_missing "$HOME/.zshrc" 'export PATH="$HOME/.cargo/bin:$PATH"'
+  append_line_if_missing "$HOME/.zshrc" 'alias vim="nvim"'
+}
+
+
 main() {
   log "Updating apt index"
   $SUDO apt-get update -y
@@ -232,9 +235,9 @@ main() {
     warn "watch not found"
   fi
 
-  install_oh_my_zsh
   install_rust
   install_python_stack
+  # install_oh_my_zsh
 
   log "Setting zsh as default shell (best effort)"
   if command -v chsh >/dev/null 2>&1; then
