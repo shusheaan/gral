@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 GRAL=$(pwd)
 
-ln -sf $GRAL/zshrc_pod $HOME/.zshrc
+ln -sf $GRAL/zshrc $HOME/.zshrc
 ln -sf $GRAL/tmux.conf $HOME/.tmux.conf
 
 mkdir -p $HOME/.config/nvim

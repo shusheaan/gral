@@ -1,18 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Pod-only home dir override
-export HOME=/workspace
-export ZDOTDIR=/workspace
-export XDG_CONFIG_HOME=/workspace/.config
-export XDG_CACHE_HOME=/workspace/.cache
-export XDG_DATA_HOME=/workspace/.local/share
-export XDG_STATE_HOME=/workspace/.local/state
-
-mkdir -p "$HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
-
 OMZ_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
-VENV_DIR="/workspace/.venvs/gnn"
+VENV_DIR="$HOME/.venvs/gnn"
 
 if [[ "$(id -u)" -eq 0 ]]; then
   SUDO=""
