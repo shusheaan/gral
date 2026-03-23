@@ -112,17 +112,17 @@ export LANG=en_US.UTF-8
 # fi
 
 # gurobi
-export GUROBI_HOME="/Library/gurobi1201/macos_universal2"
+export GUROBI_HOME="/Library/gurobi1301/macos_universal2"
 export PATH="${GUROBI_HOME}/bin:${PATH}"
 export DYLD_LIBRARY_PATH="${GUROBI_HOME}/lib:${DYLD_LIBRARY_PATH}"
 export CPATH="${GUROBI_HOME}/include:${CPATH}"
 export LIBRARY_PATH="${GUROBI_HOME}/lib:${LIBRARY_PATH}"
 
 # tch-rs
-export LIBTORCH="/Users/shushean/libtorch"
+export LIBTORCH=/Users/shu/Library/Python/3.9/lib/python/site-packages/torch
+export LIBTORCH_USE_PYTORCH=1
+export LIBTORCH_BYPASS_VERSION_CHECK=1
 # export DYLD_LIBRARY_PATH="${LIBTORCH}/lib:${DYLD_LIBRARY_PATH}" # segmentation fault for pytest
-# export LIBTORCH_USE_PYTORCH=1
-# export LIBTORCH_BYPASS_VERSION_CHECK=1
 
 # sys
 alias yo='sudo pacman -Syu && neofetch'
