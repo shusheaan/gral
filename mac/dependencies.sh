@@ -21,6 +21,10 @@ BREW_PACKAGES=(
   jq
   poppler
   typst
+  cmake  
+  sdl2
+  ffmpeg
+  pipx
 )
 
 OMZ_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
