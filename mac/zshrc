@@ -142,7 +142,10 @@ alias sus='systemctl suspend'
 # export FZF_DEFAULT_OPTS="--layout=reverse --preview '(highlight -O ansi {} || cat {}) 2> /dev/null | head -500'"
 
 # tmux
+alias tls='tmux ls'
+alias tnew='tmux new -s'
 alias tta='tmux attach -t'
+alias ttd='tmux detach -t'
 alias ttk='tmux kill-server'
 alias ttr='tmux resize-pane -R 20'
 alias ttl='tmux resize-pane -L 20'
