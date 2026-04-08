@@ -150,6 +150,15 @@ alias ttk='tmux kill-server'
 alias ttr='tmux resize-pane -R 20'
 alias ttl='tmux resize-pane -L 20'
 
+# workmux
+alias wls='workmux ls'
+alias wadd='workmux add'
+alias wopen='workmux open'
+alias wrm='workmux rm'
+alias wopen='workmux open'
+alias wdb='workmux dashboard'
+alias wmerge='workmux merge'
+
 # auto change directory for lf
 lfcd () {
     tmp="$(mktemp)"
