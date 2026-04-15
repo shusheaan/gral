@@ -16,11 +16,48 @@ autocmd("InsertLeave", {
 autocmd("LspAttach", {
   group = augroup("LspKeymaps", { clear = true }),
   callback = function(event)
+    -- Defer hover to basedpyright (ruff should not provide hover)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client and client.name == "ruff" then
+      client.server_capabilities.hoverProvider = false
+    end
+
+    -- Enable inlay hints (type annotations) if supported
+    if client and client.supports_method("textDocument/inlayHint") then
+      vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+    end
+
     local opts = { buffer = event.buf, silent = true }
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "gy", vim.lsp.buf.type_definition, opts)
-    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+
+    -- gd: smart jump — tries definition → type definition → implementation
+    vim.keymap.set("n", "gd", function()
+      vim.lsp.buf.definition({
+        on_list = function(result)
+          if result and result.items and #result.items > 0 then
+            vim.fn.setqflist({}, " ", result)
+            vim.cmd("cfirst")
+          else
+            -- fallback: try type definition, then implementation
+            vim.lsp.buf.type_definition({
+              on_list = function(r2)
+                if r2 and r2.items and #r2.items > 0 then
+                  vim.fn.setqflist({}, " ", r2)
+                  vim.cmd("cfirst")
+                else
+                  vim.lsp.buf.implementation()
+                end
+              end,
+            })
+          end
+        end,
+      })
+    end, opts)
+
+    -- gr: find all references (telescope UI)
+    vim.keymap.set("n", "gr", function()
+      require("telescope.builtin").lsp_references()
+    end, opts)
+
     vim.keymap.set("n", "gk", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)

@@ -4,9 +4,9 @@
 
 [manager]
 prepend_keymap = [
-  # -- lf legacy: J/K for 7-line jumps --
-  { on = "J", run = "arrow 7",  desc = "Move 7 lines down" },
-  { on = "K", run = "arrow -7", desc = "Move 7 lines up" },
+  # -- lf legacy: J/K for 10-line jumps --
+  { on = "J", run = "arrow 10",  desc = "Move 10 lines down" },
+  { on = "K", run = "arrow -10", desc = "Move 10 lines up" },
 
   # -- lf legacy: {/} for half-page scroll --
   { on = "{", run = "arrow -50%", desc = "Half page up" },

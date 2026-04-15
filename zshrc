@@ -32,7 +32,7 @@ ZSH_THEME="sammy"
 # for vim colorscheme showing in tmux
 # problem: using screen-256 color will print the command
 # solved: using xterm-256color will be fine
-export TERM=tmux-256color
+export TERM=xterm-256color
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -136,7 +136,10 @@ alias sus='systemctl suspend'
 # export FZF_DEFAULT_OPTS="--layout=reverse --preview '(highlight -O ansi {} || cat {}) 2> /dev/null | head -500'"
 
 # tmux
-alias tta='tmux attach -t'
+alias tls='tmux ls'
+alias tnew='tmux new -s'
+alias tatt='tmux attach -t'
+alias tdet='tmux detach-client -t'
 alias ttk='tmux kill-server'
 alias ttr='tmux resize-pane -R 20'
 alias ttl='tmux resize-pane -L 20'

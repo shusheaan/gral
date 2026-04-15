@@ -6,7 +6,7 @@ return {
     opts = {},
   },
 
-  -- Mason-lspconfig bridge
+  -- Mason-lspconfig bridge (auto-install servers)
   {
     "williamboman/mason-lspconfig.nvim",
     dependencies = { "williamboman/mason.nvim" },
@@ -19,7 +19,7 @@ return {
     },
   },
 
-  -- LSP configuration
+  -- LSP configuration (nvim 0.11 native API)
   {
     "neovim/nvim-lspconfig",
     dependencies = {
@@ -27,11 +27,10 @@ return {
       "saghen/blink.cmp",
     },
     config = function()
-      local lspconfig = require("lspconfig")
       local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Python: basedpyright for type checking + completions
-      lspconfig.basedpyright.setup({
+      vim.lsp.config("basedpyright", {
         capabilities = capabilities,
         settings = {
           basedpyright = {
@@ -43,16 +42,12 @@ return {
       })
 
       -- Python: ruff for linting + formatting
-      lspconfig.ruff.setup({
+      vim.lsp.config("ruff", {
         capabilities = capabilities,
-        on_attach = function(client)
-          -- Defer hover to basedpyright
-          client.server_capabilities.hoverProvider = false
-        end,
       })
 
       -- Lua (for editing nvim config)
-      lspconfig.lua_ls.setup({
+      vim.lsp.config("lua_ls", {
         capabilities = capabilities,
         settings = {
           Lua = {
@@ -64,7 +59,7 @@ return {
         },
       })
 
-      -- NOTE: rust-analyzer is handled by rustaceanvim, do NOT configure it here
+      vim.lsp.enable({ "basedpyright", "ruff", "lua_ls" })
     end,
   },
 
@@ -78,7 +73,7 @@ return {
         server = {
           default_settings = {
             ["rust-analyzer"] = {
-              checkOnSave = {
+              check = {
                 command = "clippy",
               },
               cargo = {

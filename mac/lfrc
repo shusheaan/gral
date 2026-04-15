@@ -5,11 +5,12 @@ set dircounts
 set hidden
 set number
 set relativenumber
-set ratios 2:3:4
+set ratios 2:2:3:4
 
 # ranger legacy commands
-map J push 7j
-map K push 7k
+map <esc> quit
+map J push 10j
+map K push 10k
 map } half-down
 map { half-up
 map a rename

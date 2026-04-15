@@ -38,6 +38,9 @@ opt.errorbells = false
 opt.foldmethod = "indent"
 opt.foldlevel = 99
 
+-- Timeouts
+opt.timeoutlen = 10000
+
 -- Scroll
 opt.scrolloff = 8
 

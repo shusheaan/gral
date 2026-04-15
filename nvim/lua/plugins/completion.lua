@@ -7,7 +7,16 @@ return {
   opts = {
     keymap = {
       preset = "default",
-      ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+      ["<Tab>"] = {
+        function()
+          local ok, suggestion = pcall(require, "copilot.suggestion")
+          if ok and suggestion.is_visible() then
+            suggestion.accept()
+            return true
+          end
+        end,
+        "select_next", "snippet_forward", "fallback"
+      },
       ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
       ["<CR>"] = { "accept", "fallback" },
       ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },

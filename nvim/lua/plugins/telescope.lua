@@ -6,16 +6,10 @@ return {
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   keys = {
-    { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
-    { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
-    { "<leader>fr", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
-    { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-    { "<leader>fg", "<cmd>Telescope git_files<cr>", desc = "Git files" },
-    { "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "LSP symbols" },
-    { "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
-    { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
-    { "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Grep word under cursor" },
-    { "<leader>fc", "<cmd>Telescope git_commits<cr>", desc = "Git commits" },
+    { "<leader>f", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+    { "<leader><Tab>", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
+    { "<leader>p", "<cmd>Telescope live_grep<cr>", desc = "Project search (grep)" },
+    { "<leader>w", "<cmd>Telescope grep_string<cr>", desc = "Grep word under cursor" },
   },
   config = function()
     local telescope = require("telescope")
@@ -37,13 +31,12 @@ return {
             ["<Esc>"] = actions.close,
           },
         },
-        file_ignore_patterns = {
-          "node_modules", ".git/", "target/", "__pycache__",
-          "%.pyc", "%.o", "%.so",
-        },
       },
       pickers = {
-        find_files = { hidden = true },
+        find_files = {
+          hidden = true,
+          find_command = { "fd", "--type", "f", "--strip-cwd-prefix", "--hidden" },
+        },
         oldfiles = { only_cwd = true },
       },
     })
