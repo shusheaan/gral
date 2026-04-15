@@ -60,8 +60,21 @@ return {
       })
 
       -- Rust: capabilities for rustaceanvim (v6 no longer auto-registers)
+      -- Settings here merge with vim.g.rustaceanvim defaults
       vim.lsp.config("rust_analyzer", {
         capabilities = capabilities,
+        settings = {
+          ["rust-analyzer"] = {
+            inlayHints = {
+              typeHints = { enable = true },
+              parameterHints = { enable = true },
+              chainingHints = { enable = true },
+              closingBraceHints = { enable = true, minLines = 10 },
+              closureReturnTypeHints = { enable = "always" },
+              maxLength = 100,
+            },
+          },
+        },
       })
 
       vim.lsp.enable({ "basedpyright", "ruff", "lua_ls", "rust_analyzer" })
