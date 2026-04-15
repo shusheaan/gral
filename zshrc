@@ -6,7 +6,8 @@ autoload -U colors && colors
 PS1="%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[red]%}]%{$reset_color%}$%b "
 
 # Basic auto/tab complete:
-autoload -U compinit
+autoload -U compinit promptinit
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' menu select
 zmodload zsh/complist
 compinit
@@ -35,7 +36,7 @@ ZSH_THEME="sammy"
 export TERM=xterm-256color
 
 # Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+CASE_SENSITIVE="true"
 
 # Uncomment the following line to use hyphen-insensitive completion.
 # Case-sensitive completion must be off. _ and - will be interchangeable.
@@ -80,7 +81,6 @@ export UPDATE_ZSH_DAYS=1
 # History in cache directory:
 HISTSIZE=10000
 SAVEHIST=10000
-HISTFILE=~/.cache/zsh/history
 
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -104,25 +104,30 @@ source $ZSH/oh-my-zsh.sh
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+# auto in tmux work ssh in
+if command -v tmux >/dev/null 2>&1; then
+  if [ -n "$SSH_CONNECTION" ] && [ -z "$TMUX" ] && [ -t 1 ]; then
+    exec tmux new-session -A -s work
+  fi
+fi
 
 # gurobi
-export GUROBI_HOME="/opt/gurobi1001/linux64"
-export PATH="${PATH}:${GUROBI_HOME}/bin"
-export LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
+export GUROBI_HOME="/Library/gurobi1301/macos_universal2"
+export PATH="${GUROBI_HOME}/bin:${PATH}"
+export DYLD_LIBRARY_PATH="${GUROBI_HOME}/lib:${DYLD_LIBRARY_PATH}"
+export CPATH="${GUROBI_HOME}/include:${CPATH}"
+export LIBRARY_PATH="${GUROBI_HOME}/lib:${LIBRARY_PATH}"
+
+# tch-rs
+export LIBTORCH=/Users/shu/Library/Python/3.9/lib/python/site-packages/torch
+export LIBTORCH_USE_PYTORCH=1
+export LIBTORCH_BYPASS_VERSION_CHECK=1
+# export DYLD_LIBRARY_PATH="${LIBTORCH}/lib:${DYLD_LIBRARY_PATH}" # segmentation fault for pytest
 
 # sys
 alias yo='sudo pacman -Syu && neofetch'
 alias fl='fdisk -l'
 alias refresh='source ~/.zshrc'
-alias la='ls -la'
-alias lla='exa --long --tree'
 alias kb='~/.xmodmap.sh'
 alias gc='google-chrome-stable'
 alias pm='pulsemixer'
@@ -140,10 +145,19 @@ alias sus='systemctl suspend'
 alias tls='tmux ls'
 alias tnew='tmux new -s'
 alias tatt='tmux attach -t'
-alias tdet='tmux detach-client -t'
+alias tdet='tmux detach -t'
 alias ttk='tmux kill-server'
 alias ttr='tmux resize-pane -R 20'
 alias ttl='tmux resize-pane -L 20'
+
+# workmux
+alias wls='workmux ls'
+alias wadd='workmux add'
+alias wopen='workmux open'
+alias wrm='workmux rm --keep-branch'
+alias wopen='workmux open'
+alias wdb='workmux dashboard'
+alias wmerge='workmux merge'
 
 # auto change directory for lf
 lfcd () {
@@ -175,8 +189,9 @@ alias clk='xdotool click --repeat 600 --delay 60000 1'
 alias qclk='xdotool click --repeat 600 --delay 5000 1'
 
 # cargo test
-alias ct='cargo test -- --nocapture | less'
+alias ct='cargo test -- --nocapture'
 alias cb='cargo build && rust-gdb $PWD/target/debug/$(basename "$PWD") --silent'
+export RUST_BACKTRACE=full
 
 # julia
 alias jl='julia --project=.'
@@ -194,6 +209,23 @@ alias unmute='amixer set Capture cap'
 # citrix
 alias citrix='/opt/Citrix/ICAClient/wfica'
 
+# cliclick
+alias clk='watch -n 55 cliclick c:800,800'
+alias qclk='watch -n 5 cliclick c:1000,500'
+
 # influx db token
 export INFLUXDB_TOKEN=s4pUaWzvwLeU1L0TF7EtvQuUwc16Y4voU8X4GQcrFo4f0CCdtRBhBzMKnpJROj0AdStJW7jmYN6g67xsC72OTg==
 
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# bun completions
+[ -s "/Users/shu/.bun/_bun" ] && source "/Users/shu/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
