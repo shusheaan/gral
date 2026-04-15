@@ -35,9 +35,26 @@ return {
     keys = {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview open (working changes)" },
       { "<leader>gD", "<cmd>DiffviewOpen main...HEAD<cr>", desc = "Diffview vs main (PR review)" },
+      {
+        "<leader>j",
+        function()
+          require("telescope.builtin").git_branches({
+            prompt_title = "Diff against branch",
+            attach_mappings = function(_, map)
+              map("i", "<CR>", function(prompt_bufnr)
+                local selection = require("telescope.actions.state").get_selected_entry(prompt_bufnr)
+                require("telescope.actions").close(prompt_bufnr)
+                vim.cmd("DiffviewOpen main..." .. selection.value)
+              end)
+              return true
+            end,
+          })
+        end,
+        desc = "Diffview: pick branch to diff",
+      },
       { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current)" },
       { "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "File history (repo)" },
-      { "<leader>gx", "<cmd>DiffviewClose<cr>", desc = "Diffview close" },
+      { "<leader>k", "<cmd>DiffviewClose<cr>", desc = "Diffview close" },
     },
     opts = {
       enhanced_diff_hl = true,

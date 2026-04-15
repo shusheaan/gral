@@ -59,6 +59,11 @@ return {
         },
       })
 
+      -- Rust: capabilities for rustaceanvim (v6 no longer auto-registers)
+      vim.lsp.config("rust_analyzer", {
+        capabilities = capabilities,
+      })
+
       vim.lsp.enable({ "basedpyright", "ruff", "lua_ls" })
     end,
   },

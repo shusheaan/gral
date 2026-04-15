@@ -44,7 +44,6 @@ return {
         { "<leader>g", group = "git" },
         { "<leader>d", group = "debug" },
         { "<leader>c", group = "code" },
-        { "<leader>l", group = "log (rust)" },
       })
     end,
   },
