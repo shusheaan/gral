@@ -29,29 +29,10 @@ autocmd("LspAttach", {
 
     local opts = { buffer = event.buf, silent = true }
 
-    -- gd: smart jump — tries definition → type definition → implementation
-    vim.keymap.set("n", "gd", function()
-      vim.lsp.buf.definition({
-        on_list = function(result)
-          if result and result.items and #result.items > 0 then
-            vim.fn.setqflist({}, " ", result)
-            vim.cmd("cfirst")
-          else
-            -- fallback: try type definition, then implementation
-            vim.lsp.buf.type_definition({
-              on_list = function(r2)
-                if r2 and r2.items and #r2.items > 0 then
-                  vim.fn.setqflist({}, " ", r2)
-                  vim.cmd("cfirst")
-                else
-                  vim.lsp.buf.implementation()
-                end
-              end,
-            })
-          end
-        end,
-      })
-    end, opts)
+    -- gd / gD / gi: jump to definition / type / implementation
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, opts)
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
 
     -- gr: find all references (telescope UI)
     vim.keymap.set("n", "gr", function()
@@ -64,6 +45,16 @@ autocmd("LspAttach", {
     vim.keymap.set("n", "<leader>cf", function()
       vim.lsp.buf.format({ async = true })
     end, opts)
+    vim.keymap.set("n", "<leader>ci", function()
+      local clients = vim.lsp.get_clients({ bufnr = 0 })
+      if #clients == 0 then
+        vim.notify("No LSP clients attached to this buffer", vim.log.levels.WARN)
+      else
+        for _, c in ipairs(clients) do
+          vim.notify(c.name .. " (id=" .. c.id .. ", root=" .. (c.root_dir or "nil") .. ")", vim.log.levels.INFO)
+        end
+      end
+    end, { buffer = event.buf, silent = true, desc = "LSP clients on this buffer" })
   end,
 })
 

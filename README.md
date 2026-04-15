@@ -131,9 +131,11 @@ The entire editing loop revolves around four keys (all prefixed with `<Space>` l
      ↓
   Space f     fuzzy find any file by name
      ↓
-  Space Tab   jump back to a recent file
+  Space Space jump back to a recent file
      ↓
-  gd          jump to definition (smart: def → type → impl)
+  gd          jump to definition
+  gD          jump to type definition
+  gi          jump to implementation
   Ctrl-o      jump back
   Ctrl-i      jump forward
 ```
@@ -143,7 +145,7 @@ The entire editing loop revolves around four keys (all prefixed with `<Space>` l
 2. `gd` on a symbol — jump to its definition
 3. `Ctrl-o` — jump back to where you were
 4. `Space f` — quickly open another file by name
-5. `Space Tab` — flip back to the file you just left
+5. `Space Space` — flip back to the file you just left
 6. `Space p` — grep the whole project for a string
 7. `gr` — find all references of the symbol under cursor
 
@@ -160,7 +162,7 @@ Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 | `<leader>o` | **LF file manager** (current file dir) — browse, preview, select |
 | `<leader>O` | LF file manager (project root) |
 | `<leader>f` | **Find files** by name (telescope, fd) |
-| `<leader><Tab>` | **Recent files** (oldfiles, cwd only) |
+| `<leader><leader>` | **Recent files** (oldfiles, cwd only) |
 | `<leader>p` | **Project grep** — search any text across all files |
 | `<leader>w` | Grep word under cursor across project |
 
@@ -168,7 +170,9 @@ Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 
 | Key | Action |
 |-----|--------|
-| `gd` | **Smart jump** — definition → type def → implementation (one key) |
+| `gd` | **Go to definition** |
+| `gD` | **Go to type definition** |
+| `gi` | **Go to implementation** |
 | `gr` | **Find all references** (telescope UI) |
 | `gk` | Hover documentation |
 | `Ctrl+o` | **Jump back** (after gd, gr, etc.) |
@@ -183,6 +187,7 @@ Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 | `<leader>ca` | Code action |
 | `<leader>cf` | Format buffer |
 | `<leader>cd` | Line diagnostics |
+| `<leader>ci` | LSP health check (see which servers are running) |
 
 ### Windows & Navigation
 

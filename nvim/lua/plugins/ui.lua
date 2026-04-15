@@ -16,7 +16,10 @@ return {
           { "filename", path = 1 },
           { function() return vim.fn.fnamemodify(vim.fn.getcwd(), ":~") end, color = { fg = "#a89984" } },
         },
-        lualine_x = { "encoding", "fileformat", "filetype" },
+        lualine_x = {
+          { function() return vim.lsp.status() end, color = { fg = "#fabd2f" } },
+          "filetype",
+        },
         lualine_y = { "progress" },
         lualine_z = { "location" },
       },
@@ -34,7 +37,7 @@ return {
       })
       wk.add({
         { "<leader>f", desc = "Find files" },
-        { "<leader><Tab>", desc = "Recent files" },
+        { "<leader><leader>", desc = "Recent files" },
         { "<leader>p", desc = "Project search (grep)" },
         { "<leader>w", desc = "Grep word under cursor" },
         { "<leader>o", desc = "LF (open)" },

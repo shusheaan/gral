@@ -16,7 +16,7 @@ opt.relativenumber = true
 opt.cursorline = true
 opt.showmatch = true
 opt.signcolumn = "yes"
-opt.cmdheight = 1
+opt.cmdheight = 0
 opt.termguicolors = true
 opt.fillchars:append({ vert = " " })
 
@@ -46,3 +46,13 @@ opt.scrolloff = 8
 
 -- Search
 opt.path:append("**")
+
+-- Diagnostics (error/warning display like VS Code)
+vim.diagnostic.config({
+  virtual_text = { spacing = 2, prefix = "●" },
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+  float = { border = "rounded", source = true },
+})
