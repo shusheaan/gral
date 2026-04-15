@@ -1,0 +1,51 @@
+nerdfont: false
+status_icons:
+  working: '>>>'
+  waiting: '...'
+  done: 'DONE'
+
+#-------------------------------------------------------------------------------
+# Tmux
+#-------------------------------------------------------------------------------
+
+# Mode for tmux operations: window (default) or session.
+# - window: Create windows within the current tmux session
+# - session: Create new tmux sessions for each worktree (useful for session-per-project workflows)
+# mode: session
+
+# Custom tmux pane layout (mutually exclusive with 'windows').
+# Default: Two-pane layout with shell and clear command.
+# panes:
+#   - command: pnpm install
+#     focus: true
+#   - split: horizontal
+#   - command: clear
+#     split: vertical
+#     size: 5
+panes:
+  - command: <agent>
+    focus: true
+
+#-------------------------------------------------------------------------------
+# Agent & AI
+#-------------------------------------------------------------------------------
+
+# Agent command for '<agent>' placeholder in pane commands.
+# Default: "claude"
+agent: "claude --permission-mode acceptEdits"
+
+# Multiple windows per session (session mode only, mutually exclusive with 'panes').
+# Each window can have its own pane layout. Unnamed windows get tmux's
+# automatic naming based on the running command.
+# windows:
+#   - name: editor
+#     panes:
+#       - command: <agent>
+#         focus: true
+#       - split: horizontal
+#         size: 20
+#   - name: tests
+#     panes:
+#       - command: just test --watch
+#   - panes:
+#       - command: tail -f app.log
