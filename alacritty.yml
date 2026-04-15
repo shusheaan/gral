@@ -1,4 +1,6 @@
 font:
+  normal:
+    family: "JetBrainsMono Nerd Font"
   size: 7.5
   offset:
     x: 0 # letter spacing

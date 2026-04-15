@@ -1,0 +1,37 @@
+# Yazi keymap — custom bindings migrated from lfrc
+# Default yazi keybindings (h/j/k/l, gg/G, /, q, etc.) are preserved.
+# Only additions and overrides below.
+
+[manager]
+prepend_keymap = [
+  # -- lf legacy: J/K for 7-line jumps --
+  { on = "J", run = "arrow 7",  desc = "Move 7 lines down" },
+  { on = "K", run = "arrow -7", desc = "Move 7 lines up" },
+
+  # -- lf legacy: {/} for half-page scroll --
+  { on = "{", run = "arrow -50%", desc = "Half page up" },
+  { on = "}", run = "arrow 50%",  desc = "Half page down" },
+
+  # -- lf legacy: a for rename (cursor at end) --
+  { on = "a", run = "rename --cursor=end", desc = "Rename (append)" },
+
+  # -- lf legacy: D for trash --
+  { on = "D", run = "remove", desc = "Trash selected files" },
+
+  # -- Shell access (lf: <enter> = shell) --
+  { on = "!", run = "shell --block --interactive", desc = "Open shell" },
+
+  # -- Execute file --
+  { on = "x", run = "shell --block '$@'", desc = "Execute file" },
+
+  # -- Git shortcuts --
+  { on = ["g", "p"], run = "shell 'git pull --rebase; echo; echo Done. Press enter...; read' --block", desc = "Git pull" },
+  { on = ["g", "s"], run = "shell 'git status; echo; echo Press enter...; read' --block", desc = "Git status" },
+  { on = ["g", "l"], run = "shell 'git log --graph --oneline --decorate -20; echo; echo Press enter...; read' --block", desc = "Git log" },
+
+  # -- fzf directory jump --
+  { on = "F", run = "shell 'target=$(fd --type d --hidden --exclude .git | fzf --reverse --preview \"eza -la --color=always {}\"); [ -n \"$target\" ] && ya emit cd \"$target\"' --block", desc = "FZF directory jump" },
+
+  # -- Ripgrep file search --
+  { on = "R", run = "shell 'selected=$(rg --line-number --no-heading --color=always --smart-case \"\" | fzf --ansi --reverse --delimiter : --preview \"bat --color=always {1} --highlight-line {2}\" | cut -d: -f1); [ -n \"$selected\" ] && ya emit reveal \"$selected\"' --block", desc = "Ripgrep search" },
+]

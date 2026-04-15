@@ -5,10 +5,20 @@ ln -sf $GRAL/zshrc $HOME/.zshrc
 mkdir -p ~/.oh-my-zsh/custom/themes
 ln -sf $GRAL/custom.zsh-theme $HOME/.oh-my-zsh/custom/themes/custom.zsh-theme
 
-mkdir -p $HOME/.config/nvim
+# Vim (minimal fallback)
 ln -sf $GRAL/vimrc $HOME/.vimrc
-ln -sf $GRAL/vimrc $HOME/.config/nvim/init.vim
 
+# Neovim (main editor — entire directory)
+rm -rf $HOME/.config/nvim
+ln -sf $GRAL/nvim $HOME/.config/nvim
+
+# Yazi file manager
+mkdir -p $HOME/.config/yazi
+ln -sf $GRAL/yazi/yazi.toml $HOME/.config/yazi/yazi.toml
+ln -sf $GRAL/yazi/keymap.toml $HOME/.config/yazi/keymap.toml
+ln -sf $GRAL/yazi/theme.toml $HOME/.config/yazi/theme.toml
+
+# lf (legacy, kept for reference)
 mkdir -p $HOME/.config/lf
 ln -sf $GRAL/lfrc $HOME/.config/lf/lfrc
 ln -sf $GRAL/pv.sh $HOME/.config/lf/pv.sh

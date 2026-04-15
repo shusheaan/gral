@@ -7,10 +7,20 @@ ln -sf $GRAL/tmux.conf $HOME/.tmux.conf
 ln -sf $GRAL/xmodmap.sh $HOME/.xmodmap.sh
 ln -sf $GRAL/xmodmap.conf $HOME/.xmodmap.conf
 
-mkdir -p $HOME/.config/nvim
-ln -sf $GRAL/vimrc $HOME/.config/nvim/init.vim
-ln -sf $GRAL/coc.json $HOME/.config/nvim/coc-settings.json
+# Vim (minimal fallback)
+ln -sf $GRAL/vimrc $HOME/.vimrc
 
+# Neovim (main editor — entire directory)
+rm -rf $HOME/.config/nvim
+ln -sf $GRAL/nvim $HOME/.config/nvim
+
+# Yazi file manager
+mkdir -p $HOME/.config/yazi
+ln -sf $GRAL/yazi/yazi.toml $HOME/.config/yazi/yazi.toml
+ln -sf $GRAL/yazi/keymap.toml $HOME/.config/yazi/keymap.toml
+ln -sf $GRAL/yazi/theme.toml $HOME/.config/yazi/theme.toml
+
+# lf (legacy, kept for reference)
 mkdir -p $HOME/.config/lf
 ln -sf $GRAL/lf.conf $HOME/.config/lf/lfrc
 ln -sf $GRAL/lfpv.sh $HOME/.config/lf/preview.sh
