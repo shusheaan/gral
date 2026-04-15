@@ -122,34 +122,67 @@ Auto-installed by rustaceanvim/mason: codelldb (Rust debugger).
 | CSV | **csv.vim** | Column alignment, sorting |
 | Undo History | **undotree** | Visual undo tree |
 
+## Core Workflow
+
+The entire editing loop revolves around four keys (all prefixed with `<Space>` leader):
+
+```
+  Space o     open LF file manager → browse/select file
+     ↓
+  Space f     fuzzy find any file by name
+     ↓
+  Space Tab   jump back to a recent file
+     ↓
+  gd          jump to definition (smart: def → type → impl)
+  Ctrl-o      jump back
+  Ctrl-i      jump forward
+```
+
+**Typical session:**
+1. `Space o` — open LF, visually browse the project, pick a file
+2. `gd` on a symbol — jump to its definition
+3. `Ctrl-o` — jump back to where you were
+4. `Space f` — quickly open another file by name
+5. `Space Tab` — flip back to the file you just left
+6. `Space p` — grep the whole project for a string
+7. `gr` — find all references of the symbol under cursor
+
+Everything fans out from **open → find → recent → jump → jump back**.
+
 ## Keybindings
 
 Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 
-### Find & Search
+### Find & Open
 
 | Key | Action |
 |-----|--------|
-| `<leader>f` | Find files (frecency — recent/frequent first) |
-| `<leader><Tab>` | Recent files |
-| `<leader>p` | Project search — grep any text across all files |
-| `<leader>w` | Grep word under cursor across project |
-| `<leader>o` | LF file manager (current file dir) |
+| `<leader>o` | **LF file manager** (current file dir) — browse, preview, select |
 | `<leader>O` | LF file manager (project root) |
+| `<leader>f` | **Find files** by name (telescope, fd) |
+| `<leader><Tab>` | **Recent files** (oldfiles, cwd only) |
+| `<leader>p` | **Project grep** — search any text across all files |
+| `<leader>w` | Grep word under cursor across project |
 
-### Code Navigation (LSP)
+### Jump (LSP)
 
 | Key | Action |
 |-----|--------|
-| `gd` | **Smart jump** — definition → type → implementation (one key does all) |
-| `gr` | **Find all references** — telescope UI showing every usage in project |
+| `gd` | **Smart jump** — definition → type def → implementation (one key) |
+| `gr` | **Find all references** (telescope UI) |
 | `gk` | Hover documentation |
+| `Ctrl+o` | **Jump back** (after gd, gr, etc.) |
+| `Ctrl+i` | **Jump forward** |
+| `[g` / `]g` | Previous / next diagnostic |
+
+### Code Actions (LSP)
+
+| Key | Action |
+|-----|--------|
 | `<leader>cr` | Rename symbol (across project) |
 | `<leader>ca` | Code action |
 | `<leader>cf` | Format buffer |
 | `<leader>cd` | Line diagnostics |
-| `[g` / `]g` | Previous / next diagnostic |
-| `Ctrl+o` / `Ctrl+i` | Jump back / forward (after gd, gr, etc.) |
 
 ### Windows & Navigation
 
@@ -172,6 +205,7 @@ Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 | `<leader>gd` | Diffview (working changes) |
 | `<leader>gD` | Diffview vs main (PR review) |
 | `<leader>gh` | File git history |
+| `<leader>gH` | Repo git history |
 | `<leader>gp` | Preview hunk |
 | `<leader>gs` | Stage hunk |
 | `<leader>gr` | Reset hunk |
@@ -190,7 +224,20 @@ Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 | `<leader>di` | Step into |
 | `<leader>dO` | Step out |
 | `<leader>du` | Toggle DAP UI |
+| `<leader>dr` | DAP REPL |
+| `<leader>dl` | Run last |
 | `<leader>dx` | Terminate |
+
+### Completion & Copilot
+
+| Key | Action |
+|-----|--------|
+| `Tab` | Accept Copilot suggestion → next completion → snippet forward |
+| `S-Tab` | Previous completion / snippet backward |
+| `CR` | Accept completion |
+| `Ctrl+Space` | Show/toggle completion docs |
+| `Alt+]` / `Alt+[` | Next / previous Copilot suggestion |
+| `Ctrl+]` | Dismiss Copilot suggestion |
 
 ### Misc
 
@@ -198,8 +245,6 @@ Leader key: `<Space>` (hold 0.5s to see all keybindings via which-key)
 |-----|--------|
 | `<leader>u` | Undotree |
 | `<leader>le/ld/lt/li` | Rust log macros (error/debug/trace/info) |
-| `Tab` | Accept Copilot suggestion / next completion |
-| `Alt+]` / `Alt+[` | Next / previous Copilot suggestion |
 
 ### LF File Manager (inside lf)
 
