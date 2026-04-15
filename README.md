@@ -21,8 +21,6 @@ brew install neovim fd ripgrep fzf bat lf yazi jq eza
 
 # Node.js (required by some LSPs, e.g. basedpyright)
 brew install node
-# NVM is also configured in zshrc if needed:
-# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 
 # Formatters & linters (used by conform.nvim and nvim-lint)
 brew install stylua taplo           # Lua, TOML formatters
@@ -67,7 +65,7 @@ cd ~/GitHub/gral
 ./mac/install
 ```
 
-This creates symlinks for: zshrc, tmux.conf, vimrc, nvim config directory, yazi config, workmux config, lf config.
+This creates symlinks for: zshrc, tmux.conf, vimrc, nvim config directory, yazi config, workmux config, lf config, custom zsh theme.
 
 ### 6. Open Neovim
 
@@ -86,6 +84,20 @@ cd ~/GitHub/gral
 ```
 
 The Linux install script also symlinks: xinitrc, xmodmap, i3, polybar, neofetch, alacritty configs.
+
+## From-Zero Setup (Cloud GPU — RunPod)
+
+```bash
+# Build and push the Docker image (from local machine)
+cd ~/GitHub/gral/pod
+docker build -t <your-user>/gral-pod .
+docker push <your-user>/gral-pod
+
+# On the pod instance
+./env.sh && zsh && ./install
+```
+
+The pod Dockerfile is based on `runpod/pytorch` with CUDA, and includes: neovim, tmux, zsh, ripgrep, fd, fzf, bat, Rust toolchain, PyTorch Geometric.
 
 ## Dependencies Summary
 
@@ -426,6 +438,14 @@ Font is **JetBrainsMono Nerd Font**, configured per terminal emulator:
 
 Neovim (terminal) inherits font settings from the terminal emulator. `vim.opt.linespace` only works in GUI clients (Neovide, etc.).
 
+## Workmux
+
+[Workmux](https://github.com/pommee/workmux) is a tmux workspace manager for git worktree workflows. Config at `workmux/config.yaml`.
+
+- Mode: window (creates windows within the current tmux session)
+- Default pane layout: opens a Claude Code agent (`claude --permission-mode acceptEdits`)
+- Aliases: `wls`, `wadd`, `wopen`, `wrm`, `wdb`, `wmerge`
+
 ## Directory Structure
 
 ```
@@ -456,25 +476,29 @@ gral/
 │   └── theme.toml           # Gruvbox color theme
 ├── workmux/                 # Workmux (tmux workspace manager)
 │   └── config.yaml
-├── alacritty.yml            # Alacritty terminal (gruvbox, JetBrains Mono, tmux auto-start)
-├── tmux.conf                # tmux (no prefix, gruvbox, vim copy mode)
-├── zshrc                    # Zsh (oh-my-zsh, vi-mode, aliases, env vars)
-├── vimrc                    # Minimal Vim fallback (no plugins)
-├── lfrc                     # lf config (Linux)
-├── lf.conf                  # lf config (symlinked as lfrc)
-├── pv.sh                    # lf previewer script (macOS)
-├── lfpv.sh                  # lf previewer script (Linux)
 ├── mac/                     # macOS-specific
 │   ├── install              # macOS symlink script
 │   ├── dependencies.sh      # Homebrew + oh-my-zsh bootstrap
 │   ├── rust_dep.sh          # Rust toolchain + cargo tools
-│   ├── tmux.conf            # macOS tmux (no status-right clock)
+│   ├── tmux.conf            # macOS tmux variant
 │   ├── zshrc                # macOS zshrc
 │   ├── vimrc                # macOS Vim fallback
 │   ├── lfrc                 # macOS lf config
 │   ├── pv.sh                # macOS lf previewer
 │   ├── notes.md             # Setup notes
 │   └── custom.zsh-theme     # Custom zsh prompt theme
+├── pod/                     # RunPod (cloud GPU) configuration
+│   ├── dockerfile           # Docker image (PyTorch + CUDA + Rust + dev tools)
+│   ├── env.sh               # Environment setup script
+│   ├── install              # Pod symlink script
+│   └── notes.md             # Pod setup instructions
+├── backups/                 # Old configs and reference files
+│   ├── misc/                # xbindkeys, compton, etc.
+│   └── remap/               # HHKB, Karabiner, xmodmap configs
+├── alacritty.yml            # Alacritty terminal (gruvbox, JetBrains Mono, tmux auto-start)
+├── tmux.conf                # tmux (no prefix, gruvbox, vim copy mode)
+├── zshrc                    # Zsh (oh-my-zsh, vi-mode, aliases, env vars)
+├── vimrc                    # Minimal Vim fallback (no plugins)
 ├── install                  # Linux symlink script (includes i3, polybar, alacritty)
 ├── i3.conf                  # i3 window manager (Linux)
 ├── polybar.conf             # Polybar status bar (Linux)
@@ -482,9 +506,12 @@ gral/
 ├── xinitrc                  # X11 init (Linux)
 ├── xmodmap.conf             # Key remapping (Linux)
 ├── xmodmap.sh               # Key remapping script (Linux)
+├── lfrc                     # lf config (Linux)
+├── lf.conf                  # lf config (symlinked as lfrc)
+├── pv.sh                    # lf previewer script (macOS)
+├── lfpv.sh                  # lf previewer script (Linux)
 ├── custom.zsh-theme         # Zsh prompt theme
-├── SOP.sh                   # Standard operating procedure script
-└── pod/                     # Pod configs
+└── SOP.sh                   # Standard operating procedure script
 ```
 
 ## Zsh Config
