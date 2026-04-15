@@ -64,7 +64,7 @@ return {
         capabilities = capabilities,
       })
 
-      vim.lsp.enable({ "basedpyright", "ruff", "lua_ls" })
+      vim.lsp.enable({ "basedpyright", "ruff", "lua_ls", "rust_analyzer" })
     end,
   },
 
