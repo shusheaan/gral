@@ -86,6 +86,7 @@ HISTFILE=~/.cache/zsh/history
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 plugins=(
     git
+    zsh-autosuggestions
     zsh-completions
     zsh-syntax-highlighting
 )
