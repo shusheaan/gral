@@ -46,7 +46,7 @@ map o &mimeopen $f
 map O $mimeopen --ask $f
 
 # define a custom 'open' command
-cmd open $code $fx # use nvim for files
+cmd open $nvim $fx # use nvim for files
 # cmd open $xdg-open $f # use xdg-open for files
 # cmd open ${{
 #     case $(file --mime-type -Lb $f) in
