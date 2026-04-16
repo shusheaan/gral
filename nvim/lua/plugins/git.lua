@@ -36,7 +36,7 @@ return {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview open (working changes)" },
       { "<leader>gD", "<cmd>DiffviewOpen main...HEAD<cr>", desc = "Diffview vs main (PR review)" },
       {
-        "<leader>j",
+        "<leader>gB",
         function()
           require("telescope.builtin").git_branches({
             prompt_title = "Diff against branch",
@@ -54,7 +54,7 @@ return {
       },
       { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current)" },
       { "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "File history (repo)" },
-      { "<leader>k", "<cmd>DiffviewClose<cr>", desc = "Diffview close" },
+      { "<leader>w", "<cmd>DiffviewClose<cr>", desc = "Diffview close" },
     },
     opts = {
       enhanced_diff_hl = true,

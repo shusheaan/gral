@@ -37,9 +37,10 @@ return {
       })
       wk.add({
         { "<leader>f", desc = "Find files" },
-        { "<leader><leader>", desc = "Recent files" },
+        { "<leader>j", desc = "Recent files" },
         { "<leader>p", desc = "Project search (grep)" },
-        { "<leader>w", desc = "Grep word under cursor" },
+        { "<leader>w", desc = "Diffview close" },
+        { "<leader>F", desc = "Grep word under cursor" },
         { "<leader>o", desc = "LF (open)" },
         { "<leader>g", group = "git" },
         { "<leader>d", group = "debug" },
