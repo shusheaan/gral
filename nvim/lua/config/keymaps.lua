@@ -31,3 +31,6 @@ map("n", "gl", "<cmd>diffget //3<cr>", { desc = "Diffget theirs" })
 map("n", "[g", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 map("n", "]g", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
+
+-- Rust-analyzer status
+map("n", "<leader>rr", "<cmd>Ra<cr>", { desc = "Rust-analyzer status" })

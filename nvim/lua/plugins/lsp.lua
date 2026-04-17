@@ -89,6 +89,11 @@ return {
     init = function()
       vim.g.rustaceanvim = {
         server = {
+          -- LSP is handled by nvim-lspconfig's rust_analyzer above.
+          -- rustaceanvim stays around only for :RustLsp runnables/debuggables
+          -- and DAP integration. Disable its auto-attach to prevent a second
+          -- rust-analyzer process from spawning.
+          auto_attach = false,
           default_settings = {
             ["rust-analyzer"] = {
               check = {

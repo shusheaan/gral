@@ -82,3 +82,24 @@ autocmd("BufWritePre", {
 
 -- Ensure undo directory exists
 vim.fn.mkdir(vim.fn.expand("~/.vim/undodir"), "p")
+
+-- :Ra — quick rust-analyzer progress / workspace status
+vim.api.nvim_create_user_command("Ra", function()
+  local progress = vim.lsp.status()
+  if progress == "" then
+    progress = "(idle — no active progress)"
+  end
+  vim.notify("progress: " .. progress, vim.log.levels.INFO)
+  local ok = vim.lsp.buf_request(0, "rust-analyzer/analyzerStatus", {}, function(err, res)
+    if err or not res then
+      vim.notify("analyzerStatus: unavailable (" .. vim.inspect(err) .. ")", vim.log.levels.WARN)
+      return
+    end
+    -- First 2 lines of analyzerStatus are usually "workspace loaded" + counters
+    local first = res:match("^[^\n]*\n?[^\n]*") or res
+    vim.notify("rust-analyzer:\n" .. first, vim.log.levels.INFO)
+  end)
+  if not ok then
+    vim.notify("no rust-analyzer client attached", vim.log.levels.WARN)
+  end
+end, { desc = "Rust-analyzer status & indexing progress" })
