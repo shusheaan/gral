@@ -29,10 +29,14 @@ autocmd("LspAttach", {
 
     local opts = { buffer = event.buf, silent = true }
 
-    -- gd / gD / gi: jump to definition / type / implementation
+    -- gd / gD / gi / gy: definition / definition-in-vsplit / implementation / type definition
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, opts)
+    vim.keymap.set("n", "gD", function()
+      vim.cmd("vsplit")
+      vim.lsp.buf.definition()
+    end, opts)
     vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+    vim.keymap.set("n", "gy", vim.lsp.buf.type_definition, opts)
 
     -- gr: find all references (telescope UI)
     vim.keymap.set("n", "gr", function()

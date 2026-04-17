@@ -19,6 +19,8 @@ opt.signcolumn = "yes"
 opt.cmdheight = 0
 opt.termguicolors = true
 opt.fillchars:append({ vert = " " })
+opt.splitright = true
+opt.splitbelow = true
 
 -- Behavior
 opt.hidden = true
