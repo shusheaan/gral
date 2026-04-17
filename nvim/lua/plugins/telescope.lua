@@ -7,7 +7,7 @@ return {
   },
   keys = {
     { "<leader>f", "<cmd>Telescope find_files<cr>", desc = "Find files" },
-    { "<leader>j", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
+    { "<leader><leader>", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
     { "<leader>p", "<cmd>Telescope live_grep<cr>", desc = "Project search (grep)" },
     { "<leader>F", "<cmd>Telescope grep_string<cr>", desc = "Grep word under cursor" },
   },

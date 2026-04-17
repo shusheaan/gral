@@ -36,7 +36,7 @@ return {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview open (working changes)" },
       { "<leader>gD", "<cmd>DiffviewOpen main...HEAD<cr>", desc = "Diffview vs main (PR review)" },
       {
-        "<leader>gB",
+        "<leader>gg",
         function()
           require("telescope.builtin").git_branches({
             prompt_title = "Diff against branch",
