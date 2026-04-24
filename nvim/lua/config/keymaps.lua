@@ -34,3 +34,11 @@ map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
 -- Rust-analyzer status
 map("n", "<leader>rr", "<cmd>Ra<cr>", { desc = "Rust-analyzer status" })
+
+-- Comment toggle (VSCode-style Ctrl+/). Terminals send <C-_> for Ctrl+/.
+map("n", "<C-_>", "gcc", { remap = true, desc = "Toggle comment line" })
+map("n", "<C-/>", "gcc", { remap = true, desc = "Toggle comment line" })
+map("x", "<C-_>", "gc", { remap = true, desc = "Toggle comment" })
+map("x", "<C-/>", "gc", { remap = true, desc = "Toggle comment" })
+map("i", "<C-_>", "<Esc>gcca", { remap = true, desc = "Toggle comment line" })
+map("i", "<C-/>", "<Esc>gcca", { remap = true, desc = "Toggle comment line" })
