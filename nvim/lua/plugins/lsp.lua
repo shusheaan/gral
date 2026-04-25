@@ -15,6 +15,7 @@ return {
         "basedpyright",
         "ruff",
         "lua_ls",
+        "marksman",
       },
     },
   },
@@ -59,6 +60,11 @@ return {
         },
       })
 
+      -- Markdown: file links, headings, references, and wiki-style links.
+      vim.lsp.config("marksman", {
+        capabilities = capabilities,
+      })
+
       -- Rust: capabilities for rustaceanvim (v6 no longer auto-registers)
       -- Settings here merge with vim.g.rustaceanvim defaults
       vim.lsp.config("rust_analyzer", {
@@ -77,7 +83,7 @@ return {
         },
       })
 
-      vim.lsp.enable({ "basedpyright", "ruff", "lua_ls", "rust_analyzer" })
+      vim.lsp.enable({ "basedpyright", "ruff", "lua_ls", "marksman", "rust_analyzer" })
     end,
   },
 
