@@ -46,6 +46,7 @@ return {
         { "<leader>d", group = "debug" },
         { "<leader>c", group = "code" },
         { "<leader>r", group = "rust" },
+        { "<leader>m", group = "markdown" },
       })
     end,
   },
