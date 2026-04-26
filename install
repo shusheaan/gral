@@ -1,5 +1,18 @@
-#!/usr/bin/zsh
+#!/usr/bin/env zsh
 GRAL=$(pwd)
+
+link_managed_path() {
+    local source="$1"
+    local target="$2"
+
+    mkdir -p "$(dirname "$target")"
+
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        mv "$target" "$target.backup.$(date +%Y%m%d%H%M%S)"
+    fi
+
+    ln -sfn "$source" "$target"
+}
 
 ln -sf $GRAL/zshrc $HOME/.zshrc
 ln -sf $GRAL/xinitrc $HOME/.xinitrc
@@ -43,3 +56,10 @@ ln -sf $GRAL/alacritty.yml $HOME/.config/alacritty/alacritty.yml
 
 mkdir -p $HOME/.oh-my-zsh/custom/themes
 ln -sf $GRAL/custom.zsh-theme $HOME/.oh-my-zsh/custom/themes/custom.zsh-theme
+
+# Claude AI agents and skills
+# agent-memory is intentionally not synced — it's machine-local working state.
+# Per-project memory under ~/.claude/projects/*/memory/ also stays local.
+link_managed_path "$GRAL/claude/settings.json" "$HOME/.claude/settings.json"
+link_managed_path "$GRAL/claude/agents" "$HOME/.claude/agents"
+link_managed_path "$GRAL/claude/skills" "$HOME/.claude/skills"
