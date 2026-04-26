@@ -7,6 +7,10 @@ set number
 set relativenumber
 set ratios 2:2:3:4
 
+# theme accents
+set promptfmt "\033[38;2;125;174;163m%u@%h\033[0m:\033[38;2;137;180;178m%d\033[0m\033[38;2;235;219;178m%f\033[0m"
+set numberfmt "\033[38;2;168;153;132m"
+
 # ranger legacy commands
 map <esc> quit
 map J push 10j
