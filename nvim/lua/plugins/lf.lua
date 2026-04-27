@@ -18,7 +18,7 @@ local function open_lf(dir)
   })
   vim.api.nvim_set_option_value("winhighlight", "Normal:Normal,NormalFloat:Normal", { win = vim.api.nvim_get_current_win() })
 
-  vim.fn.termopen(cmd, {
+  local job = vim.fn.termopen(cmd, {
     on_exit = function()
       vim.schedule(function()
         -- Close the float
@@ -38,6 +38,8 @@ local function open_lf(dir)
       end)
     end,
   })
+
+  vim.keymap.set("t", "<esc>", function() vim.fn.chansend(job, "q") end, { buffer = buf })
 
   vim.cmd("startinsert")
 end
