@@ -61,5 +61,6 @@ ln -sf $GRAL/custom.zsh-theme $HOME/.oh-my-zsh/custom/themes/custom.zsh-theme
 # agent-memory is intentionally not synced — it's machine-local working state.
 # Per-project memory under ~/.claude/projects/*/memory/ also stays local.
 link_managed_path "$GRAL/claude/settings.json" "$HOME/.claude/settings.json"
+link_managed_path "$GRAL/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 link_managed_path "$GRAL/claude/agents" "$HOME/.claude/agents"
 link_managed_path "$GRAL/claude/skills" "$HOME/.claude/skills"
