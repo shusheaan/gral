@@ -17,8 +17,14 @@ architecture (that is the reviewer's job).
 
 - **Split over-cap documents** — when a file exceeds the project's line
   cap, break it into shorter focused files and add cross-links.
-- **Maintain bilingual parity** — when the project uses CN/EN dual
-  files, regenerate the stale side from the fresh side.
+- **Maintain bilingual parity (mandatory, global)** — every markdown
+  document under `docs/` MUST have both an English (`<name>.md`) and
+  Chinese (`<name>.cn.md`) version. When syncing, if one side is
+  missing, generate it from the existing side; if both exist but one
+  is staler, regenerate the stale side from the fresh side. Exempt
+  paths: `docs/_historical/`, `docs/archive/`, machine-generated files
+  (call graphs, etc.), and top-level `README.md` only when the project
+  explicitly opts out in `CLAUDE.md`.
 - **Regenerate auto-generated diagrams** — call graphs, dependency
   graphs, if the project has a generator script.
 - **Detect drift** — flag source code newer than docs that reference it.

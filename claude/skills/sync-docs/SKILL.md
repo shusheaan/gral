@@ -1,6 +1,6 @@
 ---
 name: sync-docs
-description: Inspect docs/ tree for broken links, missing template sections, bilingual drift, and stale references; report issues sorted by severity. Use when the user says 'sync docs' or 'review docs' and the curator agent is active.
+description: Inspect docs/ tree for broken links, missing template sections, bilingual EN/CN parity (mandatory globally — every markdown needs both <name>.md and <name>.cn.md), and stale references; report issues sorted by severity. Use when the user says 'sync docs' or 'review docs' and the curator agent is active.
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -29,12 +29,28 @@ Compare each file against the project's documented cap (read
 - File > 150% of cap → 🔴 over-cap
 - File > 100% of cap → 🟡 approaching cap
 
-### 2. Bilingual parity (if project uses dual-file convention)
+### 2. Bilingual parity (MANDATORY — applies to every project)
 
-For each `<name>.md` not under `_historical/`:
-- Check whether `<name>.cn.md` exists (or `<name>_CN.md` — read the
-  project's convention from `CLAUDE.md`).
-- If one side is newer than the other (`stat -f %m`), flag drift.
+Every markdown file under `docs/` must exist in both languages:
+`<name>.md` (English) AND `<name>.cn.md` (Chinese).
+
+Exempt paths:
+- `docs/_historical/`, `docs/archive/`
+- machine-generated files (call graphs, etc.)
+- files the project explicitly opts out of in `CLAUDE.md`
+
+For each `<name>.md` not in an exempt path:
+- Missing `<name>.cn.md` → 🔴 missing-translation (CN side absent).
+- Missing `<name>.md` while `<name>.cn.md` exists → 🔴
+  missing-translation (EN side absent).
+- Both exist but `stat -f %m` differs by > 1 day → 🟡 bilingual-drift,
+  list the stale side.
+
+The legacy `<name>_CN.md` naming is also accepted if the project's
+`CLAUDE.md` declares it; otherwise normalize to `<name>.cn.md`.
+
+In `sync` mode the curator generates the missing side from the fresh
+side and refreshes the stale side; in `review` mode just report.
 
 ### 3. Link integrity
 
