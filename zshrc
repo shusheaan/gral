@@ -126,6 +126,11 @@ export LIBTORCH_USE_PYTORCH=1
 export LIBTORCH_BYPASS_VERSION_CHECK=1
 # export DYLD_LIBRARY_PATH="${LIBTORCH}/lib:${DYLD_LIBRARY_PATH}" # segmentation fault for pytest
 
+# python: centralize caches to avoid per-folder pollution
+export MYPY_CACHE_DIR="$HOME/.cache/mypy"
+export PYTHONPYCACHEPREFIX="$HOME/.cache/pycache"
+export RUFF_CACHE_DIR="$HOME/.cache/ruff"
+
 # sys
 alias yo='sudo pacman -Syu && neofetch'
 alias fl='fdisk -l'
