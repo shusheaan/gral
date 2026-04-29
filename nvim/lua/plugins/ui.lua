@@ -54,8 +54,17 @@ return {
   -- Undotree
   { "mbbill/undotree" },
 
-  -- CSV
-  { "chrisbra/csv.vim", ft = "csv" },
+  -- CSV: load on BufReadPre (not FileType) so ftplugin is in rtp
+  -- before nvim fires FileType csv. With ft="csv", lazy.nvim re-fires
+  -- the event after loading, which races with syntax/csv.vim and trips
+  -- "Invalid column pattern / ftplugin hasn't been sourced" warning.
+  {
+    "chrisbra/csv.vim",
+    event = {
+      { event = "BufReadPre", pattern = { "*.csv", "*.tsv", "*.tab", "*.dat" } },
+      { event = "BufNewFile", pattern = { "*.csv", "*.tsv", "*.tab", "*.dat" } },
+    },
+  },
 
   -- Web devicons
   { "nvim-tree/nvim-web-devicons", lazy = true },
