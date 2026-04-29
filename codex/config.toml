@@ -1,6 +1,7 @@
 model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 model_instructions_file = "/Users/shu/.codex/AGENTS.md"
+approvals_reviewer = "guardian_subagent"
 
 [projects."/Users/shu/GitHub/starapp"]
 trust_level = "trusted"
