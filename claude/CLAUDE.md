@@ -6,6 +6,12 @@
 
 ## First Principles
 
+- **Start from why**: if motivation, goal, or success criteria are unclear, stop and discuss before acting; every decision must answer the basic “why”.
+- **Prefer the direct path**: when the goal is clear but the requested path is not the best, shortest, or simplest, first suggest the better approach.
+- **Root cause + focus**: when problems appear, identify the core cause before fixing; summarize at most three key points first and keep the work centered on them.
+
+## Engineering Principles
+
 - **Correctness first**: boundary checks, complete typing, explicit errors; never rely on runtime coincidence
 - **Minimal design**: write only the code needed now; no extension points for hypothetical futures
 - **Orthogonal + modular**: single responsibility, module DAG, composition over inheritance
