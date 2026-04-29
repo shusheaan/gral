@@ -63,21 +63,36 @@ autocmd("LspAttach", {
 })
 
 -- CSV formatting (requires csv.vim)
+-- Use FileType (not BufRead) so lazy.nvim loads csv.vim and its
+-- ftplugin registers buffer-local :ArrangeColumn / :Sort first.
 local csv_group = augroup("CSVEditing", { clear = true })
-autocmd({ "BufRead", "BufWritePost" }, {
+local function run_if_exists(cmd)
+  if vim.fn.exists(":" .. cmd:match("^%s*%%?(%a+)")) == 2 then
+    pcall(vim.cmd, cmd)
+  end
+end
+autocmd("FileType", {
   group = csv_group,
-  pattern = "*.csv",
-  command = ":%ArrangeColumn",
+  pattern = "csv",
+  callback = function()
+    run_if_exists("%ArrangeColumn")
+    run_if_exists("%Sort 1")
+  end,
 })
-autocmd({ "BufRead", "BufWritePost" }, {
+autocmd("BufWritePost", {
   group = csv_group,
   pattern = "*.csv",
-  command = ":%Sort 1",
+  callback = function()
+    run_if_exists("%ArrangeColumn")
+    run_if_exists("%Sort 1")
+  end,
 })
 autocmd("BufWritePre", {
   group = csv_group,
   pattern = "*.csv",
-  command = ":%UnArrangeColumn",
+  callback = function()
+    run_if_exists("%UnArrangeColumn")
+  end,
 })
 
 -- Ensure undo directory exists
