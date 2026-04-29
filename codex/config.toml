@@ -1,0 +1,36 @@
+model = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+model_instructions_file = "/Users/shu/.codex/AGENTS.md"
+
+[projects."/Users/shu/GitHub/starapp"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/staropt"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/feat"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/aces"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/anya"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/loci"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/gral"]
+trust_level = "trusted"
+
+[projects."/Users/shu/GitHub/star"]
+trust_level = "trusted"
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[features]
+codex_hooks = true
