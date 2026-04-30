@@ -1,6 +1,6 @@
 ---
 name: merge
-description: Commit, rebase, and merge the current branch.
+description: Commit, rebase, and merge the current branch without workmux.
 disable-model-invocation: true
 allowed-tools: Read, Bash, Glob, Grep
 ---
@@ -9,61 +9,71 @@ allowed-tools: Read, Bash, Glob, Grep
 
 **Arguments:** `$ARGUMENTS`
 
-Check the arguments for flags:
+Commit, rebase, and merge the current branch using plain `git` only. Do **not**
+run `workmux` or clean up external worktrees/tmux windows.
 
-- `--keep`, `-k` → pass `--keep` to `workmux merge` (keeps the worktree and tmux window after merging)
-- `--no-verify`, `-n` → pass `--no-verify` to `workmux merge`
+## Flags
 
-Strip all flags from arguments.
+- `--base <branch>` → merge into this local base branch. Default: `main`.
+- `--no-verify`, `-n` → pass `--no-verify` to `git commit` and `git merge`.
+- `--keep`, `-k` → accepted as a legacy no-op; this workflow never deletes the
+  branch or worktree automatically.
 
-Commit, rebase, and merge the current branch.
+Strip flags from the remaining commit-message arguments.
 
-This command finishes work on the current branch by:
+## Step 1: Identify branches
 
-1. Committing any staged changes
-2. Rebasing onto the base branch
-3. Running `workmux merge` to merge and clean up
+Record the current branch:
 
-## Step 1: Commit
-
-If there are staged changes, commit them. Use lowercase, imperative mood, no conventional commit prefixes. Skip if nothing is staged.
-
-## Step 2: Rebase
-
-Get the base branch from git config:
-
-```
-git config --local --get "branch.$(git branch --show-current).workmux-base"
+```bash
+git branch --show-current
 ```
 
-If no base branch is configured, default to "main".
+If the current branch is empty or already equals the base branch, stop and ask
+for guidance.
 
-Rebase onto the local base branch (do NOT fetch from origin first):
+## Step 2: Commit staged changes
 
-```
+If there are staged changes, commit them. Use lowercase, imperative mood, no
+conventional commit prefixes. Skip if nothing is staged.
+
+Use `--no-verify` only when the flag was passed.
+
+## Step 3: Rebase
+
+Rebase the current branch onto the local base branch:
+
+```bash
 git rebase <base-branch>
 ```
 
-IMPORTANT: Do NOT run `git fetch`. Do NOT rebase onto `origin/<branch>`. Only rebase onto the local branch name (e.g., `git rebase main`, not `git rebase origin/main`).
+IMPORTANT: Do NOT run `git fetch`. Do NOT rebase onto `origin/<branch>`. Only
+rebase onto the local branch name (e.g., `git rebase main`, not
+`git rebase origin/main`).
 
 If conflicts occur:
 
 - BEFORE resolving any conflict, understand what changes were made to each
-  conflicting file in the base branch
+  conflicting file in the base branch.
 - For each conflicting file, run `git log -p -n 3 <base-branch> -- <file>` to
-  see recent changes to that file in the base branch
-- The goal is to preserve BOTH the changes from the base branch AND our branch's
-  changes
+  see recent changes to that file in the base branch.
+- Preserve BOTH the base branch's changes AND the current branch's changes.
 - After resolving each conflict, stage the file and continue with
-  `git rebase --continue`
-- If a conflict is too complex or unclear, ask for guidance before proceeding
+  `git rebase --continue`.
+- If a conflict is too complex or unclear, ask for guidance before proceeding.
 
-## Step 3: Merge
+## Step 4: Fast-forward merge
 
-Run: `workmux merge --rebase --notification [--keep] [--no-verify]`
+Switch to the base branch and fast-forward merge the rebased branch:
 
-Include `--keep` only if the `--keep` flag was passed in arguments.
-Include `--no-verify` only if the `--no-verify` flag was passed in arguments.
+```bash
+git switch <base-branch>
+git merge --ff-only <current-branch>
+```
 
-This will merge the branch into the base branch and clean up the worktree and
-tmux window (unless `--keep` is used).
+Pass `--no-verify` to `git merge` only when the flag was passed.
+
+## Step 5: Stop before cleanup
+
+Do not delete the branch, remove worktrees, close tmux windows, or push. Report
+the merge result and ask before any cleanup or remote operation.

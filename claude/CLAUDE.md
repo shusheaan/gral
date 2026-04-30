@@ -10,6 +10,13 @@
 - **Prefer the direct path**: when the goal is clear but the requested path is not the best, shortest, or simplest, first suggest the better approach.
 - **Root cause + focus**: when problems appear, identify the core cause before fixing; summarize at most three key points first and keep the work centered on them.
 
+## Agent Orchestration
+
+- Do **not** use `workmux` for new work. Do not run `workmux add/list/status/wait/send/capture/merge/remove/open`, and do not invoke workflows that dispatch through `workmux` such as `/worktree` or `/coordinator`.
+- For task-internal parallelism, use only the host's built-in delegation: Codex `spawn_agent` / `wait_agent`, or Claude `Agent` / `Task` subagents. Let the host manage any isolated worktree/workspace automatically.
+- Parallelize only independent subtasks with disjoint files/modules. Keep blocking work local, and integrate subagent results intentionally.
+- Treat persistent branches, PRs, and externally managed worktrees as user-level actions; ask before creating, merging, or deleting them.
+
 ## Engineering Principles
 
 - **Correctness first**: boundary checks, complete typing, explicit errors; never rely on runtime coincidence

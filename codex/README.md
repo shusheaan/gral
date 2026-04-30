@@ -2,6 +2,11 @@
 
 This directory tracks the repo-managed subset of `~/.codex`.
 
+`~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` both point at
+`claude/CLAUDE.md`. That shared Markdown explicitly forbids `workmux` for new
+agent work; task-internal parallelism should use built-in subagents and the
+host-managed worktree/workspace isolation.
+
 Synced by `sync-ai`:
 
 - `config.toml`
