@@ -17,6 +17,12 @@
 - Parallelize only independent subtasks with disjoint files/modules. Keep blocking work local, and integrate subagent results intentionally.
 - Treat persistent branches, PRs, and externally managed worktrees as user-level actions; ask before creating, merging, or deleting them.
 
+## Context Management
+
+- When context usage reaches or exceeds 60%, proactively compact the conversation before reading more files, spawning agents, or starting another large task step.
+- Prefer the host-native compact action (`/compact` or configured auto-compact) and preserve the current goal, decisions, changed files, blockers, and next step in the compact summary.
+- After compaction, continue from the summary and do not restart the task from scratch.
+
 ## Engineering Principles
 
 - **Correctness first**: boundary checks, complete typing, explicit errors; never rely on runtime coincidence

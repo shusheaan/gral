@@ -2,6 +2,8 @@ model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 model_instructions_file = "/Users/shu/.codex/AGENTS.md"
 approvals_reviewer = "guardian_subagent"
+# Auto-compact at 60% of GPT-5.5's 272k context window.
+model_auto_compact_token_limit = 163200
 
 [projects."/Users/shu/GitHub/starapp"]
 trust_level = "trusted"

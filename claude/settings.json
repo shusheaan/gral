@@ -77,7 +77,8 @@
   },
   "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true,
-  "autoCompactEnabled": false,
+  "autoCompactEnabled": true,
+  "autoCompactWindow": 120000,
   "skipAutoPermissionPrompt": true,
   "defaultMode": "acceptEdits",
   "disableBypassPermissionsMode": "disable"
