@@ -4,7 +4,7 @@
       {
         "hooks": [
           {
-            "command": "workmux set-window-status waiting",
+            "command": "/Users/shu/GitHub/gral/codex/agent_status.py waiting",
             "type": "command"
           }
         ]
@@ -14,7 +14,7 @@
       {
         "hooks": [
           {
-            "command": "workmux set-window-status working",
+            "command": "/Users/shu/GitHub/gral/codex/agent_status.py working",
             "type": "command"
           }
         ]
@@ -24,7 +24,7 @@
       {
         "hooks": [
           {
-            "command": "workmux set-window-status done",
+            "command": "/Users/shu/GitHub/gral/codex/agent_status.py done",
             "type": "command"
           }
         ]
@@ -34,7 +34,7 @@
       {
         "hooks": [
           {
-            "command": "workmux set-window-status working",
+            "command": "/Users/shu/GitHub/gral/codex/agent_status.py working",
             "type": "command"
           }
         ]

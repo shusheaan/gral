@@ -35,3 +35,13 @@ enabled = true
 
 [features]
 codex_hooks = true
+
+[tui]
+theme = "gruvbox-dark"
+status_line = [
+  "model-with-reasoning",
+  "context-used",
+  "context-window-size",
+  "current-dir",
+  "git-branch",
+]

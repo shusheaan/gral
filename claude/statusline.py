@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,7 +21,9 @@ class ContextStatus:
     model: str
     directory: str
     used_percentage: int | None
+    used_tokens: int | None
     remaining_tokens: int | None
+    context_window_tokens: int | None
     cost_usd: float | None
 
 
@@ -114,12 +119,16 @@ def build_status(data: JsonObject) -> ContextStatus:
     directory = Path(current_dir).name if current_dir else "-"
     context_window = object_at(data, "context_window")
     used_percentage = clamp_percentage(number_at(context_window, "used_percentage"))
+    used_tokens = current_context_tokens(context_window)
+    window_tokens = context_window_size(context_window)
     cost_usd = number_at(object_at(data, "cost"), "total_cost_usd")
     return ContextStatus(
         model=model,
         directory=directory,
         used_percentage=used_percentage,
+        used_tokens=used_tokens,
         remaining_tokens=remaining_tokens(context_window),
+        context_window_tokens=window_tokens,
         cost_usd=cost_usd,
     )
 
@@ -141,18 +150,40 @@ def progress_bar(percentage: int | None, width: int = 10) -> str:
     return "▓" * filled + "░" * (width - filled)
 
 
+def update_tmux_context_percentage(percentage: int | None) -> None:
+    if "TMUX" not in os.environ:
+        return
+
+    tmux = shutil.which("tmux")
+    if tmux is None:
+        return
+
+    value = "" if percentage is None else f"{percentage}%"
+    subprocess.run(
+        [tmux, "set-window-option", "-q", "@agent_context_pct", value],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+
+
 def render(status: ContextStatus) -> str:
     pct = "--" if status.used_percentage is None else f"{status.used_percentage}%"
+    used = format_tokens(status.used_tokens)
     left = format_tokens(status.remaining_tokens)
+    window = format_tokens(status.context_window_tokens)
     cost = "" if status.cost_usd is None else f" | ${status.cost_usd:.2f}"
     return (
         f"[{status.model}] {status.directory} | "
-        f"ctx {progress_bar(status.used_percentage)} {pct} ({left} left){cost}"
+        f"ctx {progress_bar(status.used_percentage)} {pct} "
+        f"({used}/{window}, {left} left){cost}"
     )
 
 
 def main() -> int:
-    print(render(build_status(read_input())))
+    status = build_status(read_input())
+    update_tmux_context_percentage(status.used_percentage)
+    print(render(status))
     return 0
 
 
