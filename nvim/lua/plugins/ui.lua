@@ -169,7 +169,7 @@ return {
             },
             {
               function()
-                return "fn: " .. navic.get_location()
+                return navic.get_location()
               end,
               cond = function()
                 return navic.is_available()
@@ -178,12 +178,12 @@ return {
             },
           },
           lualine_c = {
-            { "filename", path = 3 },
+            { "filename", path = 3, color = { fg = "#ebdbb2" } },
             {
               function()
                 return vim.fn.getcwd()
               end,
-              color = { fg = "#a89984" },
+              color = { fg = "#ebdbb2" },
             },
             "diff",
             "diagnostics",
