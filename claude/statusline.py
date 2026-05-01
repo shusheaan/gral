@@ -158,9 +158,14 @@ def update_tmux_context_percentage(percentage: int | None) -> None:
     if tmux is None:
         return
 
+    target_args: list[str] = []
+    pane_id = os.environ.get("TMUX_PANE")
+    if pane_id:
+        target_args = ["-t", pane_id]
+
     value = "" if percentage is None else f"{percentage}%"
     subprocess.run(
-        [tmux, "set-window-option", "-q", "@agent_context_pct", value],
+        [tmux, "set-window-option", "-q", *target_args, "@agent_context_pct", value],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         check=False,

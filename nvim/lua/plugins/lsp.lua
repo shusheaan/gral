@@ -16,6 +16,7 @@ return {
         "ruff",
         "lua_ls",
         "marksman",
+        "rust_analyzer",
       },
     },
   },

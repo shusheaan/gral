@@ -178,6 +178,20 @@ tnew() {
   fi
 
   local session="$1"
+  local -a size_args
+  local width="${COLUMNS:-}"
+  local height="${LINES:-}"
+
+  size_args=()
+
+  if [ -n "$TMUX" ]; then
+    width="$(tmux display-message -p '#{client_width}')" || return
+    height="$(tmux display-message -p '#{client_height}')" || return
+  fi
+
+  if [[ "$width" = <-> && "$height" = <-> ]]; then
+    size_args=(-x "$width" -y "$height")
+  fi
 
   if tmux has-session -t "=$session" 2>/dev/null; then
     _tnew_attach "$session"
@@ -185,12 +199,12 @@ tnew() {
   fi
 
   if [ "$split" -eq 1 ]; then
-    tmux new-session -d -s "$session" \; \
-      split-window -h -p "${TNEW_SPLIT_PERCENT:-75}" \; \
-      select-pane -L
+    tmux new-session -d -s "$session" "${size_args[@]}" || return
+    tmux split-window -t "=$session:" -h -p "${TNEW_SPLIT_PERCENT:-75}" || return
+    tmux select-pane -t "=$session:" -L || return
     _tnew_attach "$session"
   else
-    tmux new-session -d -s "$session"
+    tmux new-session -d -s "$session" "${size_args[@]}"
     _tnew_attach "$session"
   fi
 }

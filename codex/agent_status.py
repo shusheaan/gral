@@ -175,7 +175,17 @@ def run_command(command: Sequence[str]) -> int:
     return completed.returncode
 
 
+def tmux_target_args() -> list[str]:
+    pane_id = os.environ.get("TMUX_PANE")
+    if pane_id is None or pane_id == "":
+        return []
+    return ["-t", pane_id]
+
+
 def set_tmux_context_percentage(usage: ContextUsage) -> None:
+    if usage.used_percentage is None:
+        return
+
     if "TMUX" not in os.environ:
         return
 
@@ -183,11 +193,13 @@ def set_tmux_context_percentage(usage: ContextUsage) -> None:
     if tmux is None:
         return
 
+    target_args = tmux_target_args()
     run_command(
         [
             tmux,
             "set-window-option",
             "-q",
+            *target_args,
             "@agent_context_pct",
             format_percentage(usage.used_percentage),
         ],
