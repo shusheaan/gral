@@ -161,7 +161,14 @@ return {
           section_separators = { left = "", right = "" },
         },
         sections = {
-          lualine_a = { "mode" },
+          lualine_a = {
+            {
+              "mode",
+              fmt = function(mode)
+                return mode:lower()
+              end,
+            },
+          },
           lualine_b = {
             {
               git_branch,
