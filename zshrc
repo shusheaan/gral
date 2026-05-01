@@ -150,12 +150,50 @@ alias sus='systemctl suspend'
 
 # tmux
 alias tls='tmux ls'
-alias tnew='tmux new -s'
 alias tatt='tmux attach -t'
 alias tdet='tmux detach -t'
 alias ttk='tmux kill-server'
 alias ttr='tmux resize-pane -R 20'
 alias ttl='tmux resize-pane -L 20'
+
+_tnew_attach() {
+  if [ -n "$TMUX" ]; then
+    tmux switch-client -t "=$1"
+  else
+    tmux attach-session -t "=$1"
+  fi
+}
+
+tnew() {
+  local split=1
+
+  if [ "$1" = "--no-split" ]; then
+    split=0
+    shift
+  fi
+
+  if [ $# -ne 1 ]; then
+    echo "usage: tnew [--no-split] <session>" >&2
+    return 2
+  fi
+
+  local session="$1"
+
+  if tmux has-session -t "=$session" 2>/dev/null; then
+    _tnew_attach "$session"
+    return
+  fi
+
+  if [ "$split" -eq 1 ]; then
+    tmux new-session -d -s "$session" \; \
+      split-window -h -p "${TNEW_SPLIT_PERCENT:-75}" \; \
+      select-pane -L
+    _tnew_attach "$session"
+  else
+    tmux new-session -d -s "$session"
+    _tnew_attach "$session"
+  fi
+}
 
 # workmux
 alias wls='workmux ls'
