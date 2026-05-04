@@ -312,4 +312,35 @@ formatted_temperature() {
     awk -v temp="$temp" 'BEGIN { printf "%.0f°", temp }'
 }
 
-printf ' %s  %s ' "$(formatted_cpu_usage)" "$(formatted_temperature)"
+battery_from_pmset() {
+    command -v pmset >/dev/null 2>&1 || return 1
+    pmset -g batt 2>/dev/null | grep -E 'InternalBattery' | head -n 1
+}
+
+formatted_battery() {
+    line="$(battery_from_pmset)"
+
+    if [ -z "$line" ]; then
+        printf -- '--%%'
+        return 0
+    fi
+
+    pct="$(printf '%s\n' "$line" | sed -nE 's/.*[[:space:]]([0-9]+)%;.*/\1/p')"
+    state="$(printf '%s\n' "$line" | sed -nE 's/.*%;[[:space:]]*([^;]+);.*/\1/p')"
+
+    if [ -z "$pct" ]; then
+        printf -- '--%%'
+        return 0
+    fi
+
+    case "$state" in
+        *charging*)
+            printf '%02d%%+' "$pct"
+            ;;
+        *)
+            printf '%02d%%' "$pct"
+            ;;
+    esac
+}
+
+printf ' %s  %s  %s ' "$(formatted_cpu_usage)" "$(formatted_temperature)" "$(formatted_battery)"
