@@ -158,15 +158,8 @@ _tnew_attach() {
 }
 
 tnew() {
-  local split=1
-
-  if [ "$1" = "--no-split" ]; then
-    split=0
-    shift
-  fi
-
   if [ $# -ne 1 ]; then
-    echo "usage: tnew [--no-split] <session>" >&2
+    echo "usage: tnew <session>" >&2
     return 2
   fi
 
@@ -191,15 +184,8 @@ tnew() {
     return
   fi
 
-  if [ "$split" -eq 1 ]; then
-    tmux new-session -d -s "$session" "${size_args[@]}" || return
-    tmux split-window -t "=$session:" -h -p "${TNEW_SPLIT_PERCENT:-75}" || return
-    tmux select-pane -t "=$session:" -L || return
-    _tnew_attach "$session"
-  else
-    tmux new-session -d -s "$session" "${size_args[@]}"
-    _tnew_attach "$session"
-  fi
+  tmux new-session -d -s "$session" "${size_args[@]}" || return
+  _tnew_attach "$session"
 }
 
 # workmux
