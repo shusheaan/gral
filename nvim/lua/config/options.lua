@@ -40,8 +40,10 @@ opt.errorbells = false
 opt.foldenable = true
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-opt.foldlevel = 0
-opt.foldlevelstart = 0
+opt.foldtext = ""
+opt.fillchars:append({ fold = " ", foldsep = " " })
+opt.foldlevel = 99
+opt.foldlevelstart = 1
 
 -- Timeouts
 opt.timeoutlen = 10000
