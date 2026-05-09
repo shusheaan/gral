@@ -37,8 +37,11 @@ opt.clipboard = "unnamedplus"
 opt.errorbells = false
 
 -- Folding
-opt.foldmethod = "indent"
-opt.foldlevel = 99
+opt.foldenable = true
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldlevel = 0
+opt.foldlevelstart = 0
 
 -- Timeouts
 opt.timeoutlen = 10000

@@ -12,6 +12,15 @@ autocmd("InsertLeave", {
   callback = function() vim.opt_local.cursorline = false end,
 })
 
+-- Close folds when opening a file so functions/classes start collapsed.
+local close_folds_group = augroup("CloseFoldsOnOpen", { clear = true })
+autocmd("BufReadPost", {
+  group = close_folds_group,
+  callback = function()
+    vim.cmd("normal! zM")
+  end,
+})
+
 -- LSP keybindings on attach (applies to ALL LSP servers including rustaceanvim)
 autocmd("LspAttach", {
   group = augroup("LspKeymaps", { clear = true }),
