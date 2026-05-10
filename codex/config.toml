@@ -64,3 +64,7 @@ trusted_hash = "sha256:9d0ab46a2db8086282cb7c77422f14824c021f1f14c0aa2d2a8f6090e
 
 [hooks.state."/Users/shu/.codex/hooks.json:user_prompt_submit:0:0"]
 trusted_hash = "sha256:fb50b204b2b02df91757bc1a73505155273a24ca5d60d0439f8def4a3ab7a157"
+
+[mcp_servers.gitnexus]
+command = "/opt/homebrew/bin/gitnexus"
+args = ["mcp"]

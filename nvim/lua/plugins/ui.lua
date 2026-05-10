@@ -201,14 +201,7 @@ return {
           section_separators = { left = "", right = "" },
         },
         sections = {
-          lualine_a = {
-            {
-              "mode",
-              fmt = function(mode)
-                return mode:sub(1, 1):lower()
-              end,
-            },
-          },
+          lualine_a = {},
           lualine_b = {
             {
               git_branch,
@@ -225,17 +218,17 @@ return {
             },
           },
           lualine_c = {
-            { current_file_path, color = { fg = "#ebdbb2" } },
-            {
-              function()
-                return compact_path(vim.fn.getcwd())
-              end,
-              color = { fg = "#ebdbb2" },
-            },
+            { current_file_path, color = { fg = "#ebdbb2", gui = "bold" } },
             "diff",
             "diagnostics",
           },
           lualine_x = {
+            {
+              function()
+                return compact_path(vim.fn.getcwd())
+              end,
+              color = { fg = "#ebdbb2", gui = "bold" },
+            },
             { function() return vim.lsp.status() end, color = { fg = "#fabd2f" } },
             { "filetype", icon_only = true },
           },
