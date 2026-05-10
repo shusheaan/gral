@@ -148,6 +148,46 @@ return {
         return { fg = "#a9b665" }
       end
 
+      local function compact_path(path)
+        if path == "" then
+          return ""
+        end
+
+        local parts = {}
+        local normalized = path:gsub("\\", "/"):gsub("/+$", "")
+        for part in normalized:gmatch("[^/]+") do
+          table.insert(parts, part)
+        end
+
+        if #parts == 0 then
+          return normalized
+        end
+
+        return table.concat(parts, "/", math.max(#parts - 2, 1), #parts)
+      end
+
+      local function current_file_path()
+        local statusline_winid = vim.g.statusline_winid
+        local bufnr = vim.api.nvim_get_current_buf()
+        if statusline_winid ~= nil and vim.api.nvim_win_is_valid(statusline_winid) then
+          bufnr = vim.api.nvim_win_get_buf(statusline_winid)
+        end
+
+        local file_path = vim.api.nvim_buf_get_name(bufnr)
+        if file_path == "" then
+          return "[No Name]"
+        end
+
+        local label = compact_path(file_path)
+        if vim.bo[bufnr].modified then
+          label = label .. " [+]"
+        end
+        if vim.bo[bufnr].readonly then
+          label = label .. " [-]"
+        end
+        return label
+      end
+
       vim.api.nvim_create_autocmd({ "VimEnter", "BufEnter", "BufWritePost", "FocusGained", "DirChanged" }, {
         group = vim.api.nvim_create_augroup("LualineGitBranchState", { clear = true }),
         callback = refresh_git_state,
@@ -165,7 +205,7 @@ return {
             {
               "mode",
               fmt = function(mode)
-                return mode:lower()
+                return mode:sub(1, 1):lower()
               end,
             },
           },
@@ -185,10 +225,10 @@ return {
             },
           },
           lualine_c = {
-            { "filename", path = 3, color = { fg = "#ebdbb2" } },
+            { current_file_path, color = { fg = "#ebdbb2" } },
             {
               function()
-                return vim.fn.getcwd()
+                return compact_path(vim.fn.getcwd())
               end,
               color = { fg = "#ebdbb2" },
             },
@@ -197,7 +237,7 @@ return {
           },
           lualine_x = {
             { function() return vim.lsp.status() end, color = { fg = "#fabd2f" } },
-            "filetype",
+            { "filetype", icon_only = true },
           },
           lualine_y = { "progress" },
           lualine_z = { "location" },
