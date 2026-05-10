@@ -278,5 +278,11 @@ export NVM_DIR="$HOME/.nvm"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# r2
+export R2_ACCOUNT_ID="9247b5c66f294ba9e3a6e3a959653387"
+export R2_BUCKET="star-dvc"
+export R2_ACCESS_KEY_ID="4e4012d720ceddd50cb2a535771aa322"
+export R2_SECRET_ACCESS_KEY="7b5eaab6862683a8b848d6f452c2df711c712893975e7dd128ef66e01c7df1d7"
+
 # starting dir
 cd ~/GitHub/star/
