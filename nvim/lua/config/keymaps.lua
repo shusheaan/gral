@@ -1,4 +1,5 @@
 local map = vim.keymap.set
+local agent_locator = require("config.agent_locator")
 
 -- Basics
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
@@ -36,6 +37,12 @@ map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
 -- Rust-analyzer status
 map("n", "<leader>rr", "<cmd>Ra<cr>", { desc = "Rust-analyzer status" })
+
+-- Agent handoff locators
+map("n", "<leader>yl", agent_locator.copy, { desc = "Copy agent locator" })
+map("n", "<leader>yo", agent_locator.open_from_clipboard, { desc = "Open agent locator from clipboard" })
+vim.api.nvim_create_user_command("CopyAgentLocator", agent_locator.copy, { desc = "Copy file:line locator for agents" })
+vim.api.nvim_create_user_command("OpenAgentLocator", agent_locator.open_from_clipboard, { desc = "Open file:line locator from clipboard" })
 
 -- Comment toggle (VSCode-style Ctrl+/). Terminals send <C-_> for Ctrl+/.
 map("n", "<C-_>", "gcc", { remap = true, desc = "Toggle comment line" })

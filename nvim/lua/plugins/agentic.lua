@@ -58,7 +58,7 @@ return {
     { "<leader>ia",  function() require("agentic").add_selection_or_file_to_context() end,  mode = { "n", "v" },      desc = "Agentic: add file/selection to context" },
     { "<leader>if",  function() require("agentic").add_file() end,                          mode = "n",               desc = "Agentic: add current file" },
     { "<leader>iv",  function() require("agentic").add_selection() end,                     mode = "v",               desc = "Agentic: add visual selection" },
-    { "<leader>in",  function() require("agentic").new_session() end,                       mode = { "n", "v", "i" }, desc = "Agentic: new session" },
+    { "<leader>in",  function() require("agentic").new_session() end,                       mode = { "n", "v" },      desc = "Agentic: new session" },
     { "<leader>ir",  function() require("agentic").restore_session() end,                   mode = "n",               desc = "Agentic: restore session" },
     { "<leader>is",  function() require("agentic").switch_provider() end,                   mode = "n",               desc = "Agentic: switch provider" },
     { "<leader>id",  function() require("agentic").add_buffer_diagnostics() end,            mode = "n",               desc = "Agentic: add buffer diagnostics" },
