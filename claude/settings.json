@@ -10,12 +10,6 @@
     ],
     "defaultMode": "auto"
   },
-  "statusLine": {
-    "type": "command",
-    "command": "/Users/shu/GitHub/gral/claude/statusline.py",
-    "padding": 0,
-    "refreshInterval": 5
-  },
   "hooks": {
     "PreToolUse": [
       {
@@ -87,9 +81,34 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "/Users/shu/GitHub/gral/claude/statusline.py",
+    "padding": 0,
+    "refreshInterval": 5
+  },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "document-skills@anthropic-agent-skills": true,
+    "financial-analysis@claude-for-financial-services": true,
+    "equity-research@claude-for-financial-services": true,
+    "wealth-management@claude-for-financial-services": true,
+    "market-researcher@claude-for-financial-services": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "claude-for-financial-services": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/financial-services.git"
+      }
+    }
   },
   "sandbox": {
     "enabled": true,
@@ -98,9 +117,9 @@
     "allowUnsandboxedCommands": false
   },
   "effortLevel": "xhigh",
+  "autoCompactWindow": 120000,
   "skipDangerousModePermissionPrompt": true,
   "autoCompactEnabled": true,
-  "autoCompactWindow": 120000,
   "skipAutoPermissionPrompt": true,
   "defaultMode": "acceptEdits",
   "disableBypassPermissionsMode": "disable"
