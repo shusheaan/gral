@@ -117,7 +117,7 @@
     "allowUnsandboxedCommands": false
   },
   "effortLevel": "xhigh",
-  "autoCompactWindow": 120000,
+  "autoCompactWindow": 500000,
   "skipDangerousModePermissionPrompt": true,
   "autoCompactEnabled": true,
   "skipAutoPermissionPrompt": true,
