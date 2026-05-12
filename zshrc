@@ -260,6 +260,7 @@ alias qclk='watch -n 5 cliclick c:1000,500'
 
 # claude-code
 alias cc='claude'
+alias ca='claude agents'
 
 # influx db token
 export INFLUXDB_TOKEN=s4pUaWzvwLeU1L0TF7EtvQuUwc16Y4voU8X4GQcrFo4f0CCdtRBhBzMKnpJROj0AdStJW7jmYN6g67xsC72OTg==
