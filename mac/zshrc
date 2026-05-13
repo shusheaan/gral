@@ -188,14 +188,14 @@ tnew() {
   _tnew_attach "$session"
 }
 
-# workmux
-alias wls='workmux ls'
-alias wadd='workmux add'
-alias wopen='workmux open'
-alias wrm='workmux rm --keep-branch'
-alias wopen='workmux open'
-alias wdb='workmux dashboard'
-alias wmerge='workmux merge'
+# workmux (legacy; disabled after native agent panels)
+# alias wls='workmux ls'
+# alias wadd='workmux add'
+# alias wopen='workmux open'
+# alias wrm='workmux rm --keep-branch'
+# alias wopen='workmux open'
+# alias wdb='workmux dashboard'
+# alias wmerge='workmux merge'
 
 # auto change directory for lf
 lfcd () {

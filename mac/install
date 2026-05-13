@@ -18,9 +18,9 @@ ln -sf $GRAL/yazi/yazi.toml $HOME/.config/yazi/yazi.toml
 ln -sf $GRAL/yazi/keymap.toml $HOME/.config/yazi/keymap.toml
 ln -sf $GRAL/yazi/theme.toml $HOME/.config/yazi/theme.toml
 
-# Workmux
-mkdir -p $HOME/.config/workmux
-ln -sf $GRAL/workmux/config.yaml $HOME/.config/workmux/config.yaml
+# Workmux (legacy; disabled after native agent panels)
+# mkdir -p $HOME/.config/workmux
+# ln -sf $GRAL/workmux/config.yaml $HOME/.config/workmux/config.yaml
 
 # lf (legacy, kept for reference)
 mkdir -p $HOME/.config/lf

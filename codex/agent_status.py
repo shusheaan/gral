@@ -225,7 +225,8 @@ def main(args: Sequence[str]) -> int:
     hook_input = read_hook_input()
     usage = latest_context_usage(transcript_path_from_input(hook_input))
     set_tmux_context_percentage(usage)
-    set_workmux_status(status)
+    # Legacy workmux tab status is disabled; agents now expose native panels.
+    # set_workmux_status(status)
     return 0
 
 
