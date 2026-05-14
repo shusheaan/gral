@@ -7,7 +7,6 @@
 ## 0. 原则与非目标
 
 - [ ] 先保证能上网、Terminal 可工作、Chrome/Citrix 可登录、Bluetooth 鼠标/键盘/音频/mic 与显示器稳定，再迁移编辑器/AI/开发环境。
-- [ ] 硬件闸门：当前本机是 `MacBookAir10,1` / Apple M1 / 8 GB。如果目标机器就是这台 Apple Silicon Mac，先暂停复核：本文后续默认 x86_64 Arch 路线，`google-chrome` 与 Citrix `icaclient` AUR 路线不能直接照搬到 ARM Linux。
 - [ ] 使用 `archinstall` 简化安装；不要手写整套分区脚本，除非安装器无法满足 Btrfs/Snapper。
 - [ ] 使用 Btrfs + Snapper + `snap-pac` + `grub-btrfs`：升级前后自动快照，GRUB 里能进入快照救急。
 - [ ] 默认不装 Display Manager；登录后仍是命令行，需要图形时运行 `startsway` 或 `sway`。
@@ -22,10 +21,6 @@
 
 - 当前机器：`MacBook Air`，`MacBookAir10,1`，Apple M1，8 GB RAM。
 - 当前系统：macOS `26.4.1`，Build `25E253`，`arm64`，shell 为 `/bin/zsh`，`zsh 5.9`。
-- 当前关键 App：
-  - `/Applications/Google Chrome.app`：`148.0.7778.97`。
-  - `/Applications/Citrix Workspace.app`：`26.03.0`。
-  - `/System/Applications/Utilities/Terminal.app`：使用系统 Terminal + zsh。
 - 当前 `$HOME/GitHub`：只发现 `~/GitHub/gral` 与 `~/GitHub/star`；本次检查两者 `main` 均 `ahead=0 behind=0`，且没有 `git status --short` 输出。迁移前仍要再跑一次验证。
 - 当前值得关注的本机配置目录：`~/.ssh`、`~/.gnupg`、`~/.config`、`~/.zshrc`、`~/.zprofile`、`~/.zshenv`、`~/.gitconfig`、`~/.gitignore_global`、`~/.cargo`、`~/.rustup`、`~/.local`、`~/.npm`、`~/.claude`、`~/.codex`、`~/.agents`、`~/.docker`。
 - 当前 `~/.config` 里存在并需要迁移/对照的配置：`nvim`、`karabiner`、`lf`、`yazi`、`git`、`fish`、`htop`、`coc`、`github-copilot`、`cagent`、`macmon.json`、legacy `i3/polybar/alacritty`。
