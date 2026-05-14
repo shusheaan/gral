@@ -287,3 +287,11 @@ export R2_SECRET_ACCESS_KEY="7b5eaab6862683a8b848d6f452c2df711c712893975e7dd128e
 
 # starting dir
 cd ~/GitHub/star/
+
+# Git shortcuts
+alias ga='git add'
+alias gm='git commit -m'
+alias gp='git push origin'
+alias ga='git add -A'
+
+alias gs='git status'
