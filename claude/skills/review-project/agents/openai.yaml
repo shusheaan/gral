@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Project"
+  short_description: "Audit project architecture tests docs and health risks"
+  default_prompt: "Use $review-project to 审查项目，生成 dated bilingual health reports under review/."
