@@ -103,6 +103,8 @@ source $ZSH/oh-my-zsh.sh
 
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
+export EDITOR=nvim
+export VISUAL=nvim
 
 # auto in tmux work ssh in
 if command -v tmux >/dev/null 2>&1; then
@@ -124,8 +126,13 @@ export LIBTORCH_USE_PYTORCH=1
 export LIBTORCH_BYPASS_VERSION_CHECK=1
 # export DYLD_LIBRARY_PATH="${LIBTORCH}/lib:${DYLD_LIBRARY_PATH}" # segmentation fault for pytest
 
+# python: centralize caches to avoid per-folder pollution
+export MYPY_CACHE_DIR="$HOME/.cache/mypy"
+export PYTHONPYCACHEPREFIX="$HOME/.cache/pycache"
+export RUFF_CACHE_DIR="$HOME/.cache/ruff"
+
 # sys
-alias yo='sudo pacman -Syu && neofetch'
+alias yo='sudo pacman -Syu'
 alias fl='fdisk -l'
 alias refresh='source ~/.zshrc'
 alias kb='~/.xmodmap.sh'
@@ -251,6 +258,10 @@ alias citrix='/opt/Citrix/ICAClient/wfica'
 alias clk='watch -n 55 cliclick c:800,800'
 alias qclk='watch -n 5 cliclick c:1000,500'
 
+# claude-code
+alias cc='claude'
+alias ca='claude agents'
+
 # influx db token
 export INFLUXDB_TOKEN=s4pUaWzvwLeU1L0TF7EtvQuUwc16Y4voU8X4GQcrFo4f0CCdtRBhBzMKnpJROj0AdStJW7jmYN6g67xsC72OTg==
 
@@ -267,3 +278,20 @@ export NVM_DIR="$HOME/.nvm"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# r2
+export R2_ACCOUNT_ID="9247b5c66f294ba9e3a6e3a959653387"
+export R2_BUCKET="star-dvc"
+export R2_ACCESS_KEY_ID="4e4012d720ceddd50cb2a535771aa322"
+export R2_SECRET_ACCESS_KEY="7b5eaab6862683a8b848d6f452c2df711c712893975e7dd128ef66e01c7df1d7"
+
+# starting dir
+cd ~/GitHub/star/
+
+# Git shortcuts
+alias ga='git add'
+alias gm='git commit -m'
+alias gp='git push origin'
+alias ga='git add -A'
+
+alias gs='git status'

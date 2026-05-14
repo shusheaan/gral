@@ -51,20 +51,16 @@ sudo systemctl enable NetworkManager.service # auto connect
 # `rfkill list` and `rfkill unblock ...` if `nmcli device` shows unavailable
 sudo nmcli device wifi connect <wifi_name> password <wifi_password> # ping
 sudo pacman -Syu
-sudo pacman -S neofetch && neofetch # enjoy
 
 # essentials
 # rmdir nl whereis locate find chmod df du free ln diff date grep wc ps watch
 # sudo pacman -Q | less # explicitly installed pacman -Qe
 sudo pacman -S htop zsh fzf tmux zip unzip curl wget yarn alacritty base-devel cmake clang gdb rustup python python-pip coin-or-cbc
-sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip xdotool i3-wm polybar scrot ttf-dejavu cantarell-fonts wqy-zenhei
+sudo pacman -S xorg xorg-xinit xorg-xmodmap xcape xclip xdotool i3-wm scrot ttf-dejavu cantarell-fonts wqy-zenhei
 sudo pacman -S rsync exa bat highlight ripgrep procs pulseaudio pulseaudio-alsa pulsemixer pulseaudio-bluetooth
 
 # echo $SHELL # current # cat /etc/shells # installed shells
 chsh -s /bin/zsh # zsh as default shell
-wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh # sammy
-git clone https://github.com/zsh-users/zsh-completions $ZSH_CUSTOM/plugins/zsh-completions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
 
 # aur: chrome, lf, in $HOME/builds
 git clone https://aur.archlinux.org/<pkg_name>.git && cd <pkg_name>

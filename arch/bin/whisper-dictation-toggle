@@ -1,0 +1,109 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+state_dir="${XDG_RUNTIME_DIR:-/tmp}/gral-whisper-dictation"
+venv_dir="${WHISPER_VENV:-$HOME/.local/share/gral-whisper/.venv}"
+python_bin="$venv_dir/bin/python"
+pid_file="$state_dir/recording.pid"
+audio_file="$state_dir/input.wav"
+text_file="$state_dir/output.txt"
+log_file="$state_dir/whisper.log"
+notify_id=24051
+
+notify() {
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -a whisper -r "$notify_id" "$1" "$2"
+    fi
+}
+
+fail() {
+    notify "Whisper" "$1"
+    echo "$1" >&2
+    exit 1
+}
+
+start_recording() {
+    mkdir -p "$state_dir"
+    rm -f "$audio_file" "$text_file" "$log_file"
+
+    command -v pw-record >/dev/null 2>&1 || fail "missing pw-record"
+    command -v notify-send >/dev/null 2>&1 || true
+
+    pw-record --rate=16000 --channels=1 "$audio_file" >"$log_file" 2>&1 &
+    echo $! > "$pid_file"
+    notify "Whisper" "正在录音；再按 Ctrl+F 停止"
+}
+
+transcribe_to_clipboard() {
+    {
+        command -v wl-copy >/dev/null 2>&1 || fail "missing wl-copy"
+        [ -x "$python_bin" ] || fail "missing venv; run whisper-dictation-setup first"
+        [ -s "$audio_file" ] || fail "recording is empty"
+
+        notify "Whisper" "录音已停止，正在本地转写..."
+
+        "$python_bin" - "$audio_file" > "$text_file" <<'PY'
+import os
+import sys
+import torch
+import whisper
+
+audio_path = sys.argv[1]
+model_name = os.environ.get("WHISPER_MODEL", "large-v3")
+task = os.environ.get("WHISPER_TASK", "transcribe")
+language = os.environ.get("WHISPER_LANGUAGE") or None
+# Default stays None for Chinese/English mixed speech. Set WHISPER_LANGUAGE=zh only if you want to force Chinese.
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+model = whisper.load_model(model_name, device=device)
+kwargs = {
+    "task": task,
+    "fp16": device == "cuda",
+    "verbose": False,
+}
+if language:
+    kwargs["language"] = language
+
+result = model.transcribe(audio_path, **kwargs)
+text = (result.get("text") or "").strip()
+print(text)
+PY
+
+        if [ ! -s "$text_file" ]; then
+            fail "转写为空"
+        fi
+
+        wl-copy < "$text_file"
+        preview="$(tr '\n' ' ' < "$text_file" | cut -c 1-80)"
+        notify "Whisper" "已复制到剪贴板：$preview"
+    } >>"$log_file" 2>&1 || {
+        notify "Whisper" "失败；查看 $log_file"
+        return 1
+    }
+}
+
+stop_recording() {
+    local pid
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    rm -f "$pid_file"
+
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+        kill -INT "$pid" 2>/dev/null || kill "$pid" 2>/dev/null || true
+        for _ in {1..20}; do
+            kill -0 "$pid" 2>/dev/null || break
+            sleep 0.1
+        done
+        if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid" 2>/dev/null || true
+            sleep 0.2
+        fi
+    fi
+
+    transcribe_to_clipboard &!
+}
+
+if [ -f "$pid_file" ]; then
+    stop_recording
+else
+    start_recording
+fi

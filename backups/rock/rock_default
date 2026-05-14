@@ -8,7 +8,7 @@ sudo apt install build-essential cmake python3-dev # pre for ycmd
 sudo apt install xbindkeys x11-utils xdotool # keyboard utils
 sudo apt install ranger zsh curl git vim vim-gtk3 exuberant-ctags fzf highlight tmux nodejs yarn fwupd xcape htop 
 sudo apt install i3 xbacklight alsa-utils pulseaudio playerctl blueman feh lxappearance arc-theme arandr rofi compton
-sudo apt install caca-utils highlight atool w3m poppler-utils mediainfo gnome-tweak-tool fprintd neofetch scrot
+sudo apt install caca-utils highlight atool w3m poppler-utils mediainfo gnome-tweak-tool fprintd scrot
 sudo apt install code google-chrome-stable xfce4-terminal python3-setuptools
 sudo apt install texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra
 
@@ -45,4 +45,4 @@ sudo apt install libinput-tools ruby xdotool
 sudo gem install fusuma
 
 # show sys info
-neofetch # showit!
+# showit!

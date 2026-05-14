@@ -132,7 +132,7 @@ export PYTHONPYCACHEPREFIX="$HOME/.cache/pycache"
 export RUFF_CACHE_DIR="$HOME/.cache/ruff"
 
 # sys
-alias yo='sudo pacman -Syu && neofetch'
+alias yo='sudo pacman -Syu'
 alias fl='fdisk -l'
 alias refresh='source ~/.zshrc'
 alias kb='~/.xmodmap.sh'

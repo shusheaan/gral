@@ -1,0 +1,65 @@
+# Yazi configuration — migrated from lfrc
+# Previews are built-in (bat, eza, jq, pdf, archives all handled natively)
+
+[manager]
+ratio        = [2, 3, 4]
+sort_by      = "natural"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = true
+linemode     = "size"
+show_hidden  = true
+show_symlink = true
+scrolloff    = 10
+
+[preview]
+tab_size   = 4
+max_width  = 1000
+max_height = 1000
+
+[opener]
+edit = [
+  { run = 'nvim "$@"', block = true, for = "unix" },
+]
+open = [
+  { run = 'open "$@"', for = "macos" },
+  { run = 'xdg-open "$@"', for = "linux" },
+]
+reveal = [
+  { run = 'open -R "$1"', for = "macos" },
+  { run = 'xdg-open "$(dirname "$1")"', for = "linux" },
+]
+extract = [
+  { run = 'ya pub extract --list "$@"', desc = "Extract here", for = "unix" },
+]
+play = [
+  { run = 'open "$@"', orphan = true, for = "macos" },
+  { run = 'mpv "$@"', orphan = true, for = "linux" },
+]
+
+[open]
+rules = [
+  { mime = "text/*", use = ["edit", "open"] },
+  { mime = "application/json", use = ["edit", "open"] },
+  { name = "*.toml", use = ["edit", "open"] },
+  { name = "*.yaml", use = ["edit", "open"] },
+  { name = "*.yml", use = ["edit", "open"] },
+  { name = "*.md", use = ["edit", "open"] },
+  { name = "*.csv", use = ["edit", "open"] },
+  { name = "*.html", use = ["open", "edit"] },
+
+  { mime = "image/*", use = ["open", "reveal"] },
+  { mime = "video/*", use = ["play", "reveal"] },
+  { mime = "audio/*", use = ["play", "reveal"] },
+  { mime = "application/pdf", use = ["open", "reveal"] },
+
+  { mime = "application/zip", use = ["extract", "reveal"] },
+  { mime = "application/gzip", use = ["extract", "reveal"] },
+  { mime = "application/x-tar", use = ["extract", "reveal"] },
+  { mime = "application/x-bzip2", use = ["extract", "reveal"] },
+  { mime = "application/x-7z-compressed", use = ["extract", "reveal"] },
+  { mime = "application/x-rar", use = ["extract", "reveal"] },
+  { mime = "application/x-xz", use = ["extract", "reveal"] },
+
+  { mime = "*", use = ["open", "reveal"] },
+]

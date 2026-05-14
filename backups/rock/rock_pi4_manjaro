@@ -4,7 +4,7 @@
 # lite version - essential toolbox
 
 sudo pacman -Syu
-sudo pacman -S ranger zsh curl git vim fzf htop xcape chromium tmux ctags neofetch python-pip w3m
+sudo pacman -S ranger zsh curl git vim fzf htop xcape chromium tmux ctags python-pip w3m
 sudo pacman -S noto-fonts-cjk # chinese fonts, reboot after installing
 
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"

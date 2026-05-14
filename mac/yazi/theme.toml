@@ -1,0 +1,99 @@
+# Yazi theme — gruvbox-inspired colors
+# Uses Yazi's default theme as base with gruvbox accent colors.
+# For a full gruvbox port, see: https://github.com/bennyyip/gruvbox-dark.yazi
+
+[manager]
+cwd = { fg = "#a9b665" }
+
+hovered         = { fg = "#1d2021", bg = "#a9b665" }
+preview_hovered = { underline = true }
+
+find_keyword  = { fg = "#d8a657", bold = true, italic = true, underline = true }
+find_position = { fg = "#e78a4e", bg = "reset", italic = true }
+
+marker_selected = { fg = "#a9b665", bg = "#a9b665" }
+marker_copied   = { fg = "#d8a657", bg = "#d8a657" }
+marker_cut      = { fg = "#ea6962", bg = "#ea6962" }
+
+tab_active   = { fg = "#1d2021", bg = "#a9b665" }
+tab_inactive = { fg = "#a89984", bg = "#3c3836" }
+tab_width    = 1
+
+border_symbol = "│"
+border_style  = { fg = "#504945" }
+
+[status]
+separator_open  = ""
+separator_close = ""
+
+separator_style = { fg = "#3c3836", bg = "#3c3836" }
+
+mode_normal = { fg = "#1d2021", bg = "#a9b665", bold = true }
+mode_select = { fg = "#1d2021", bg = "#d8a657", bold = true }
+mode_unset  = { fg = "#1d2021", bg = "#ea6962", bold = true }
+
+progress_label  = { fg = "#ebdbb2", bold = true }
+progress_normal = { fg = "#504945", bg = "#3c3836" }
+progress_error  = { fg = "#ea6962", bg = "#3c3836" }
+
+permissions_t = { fg = "#a9b665" }
+permissions_r = { fg = "#d8a657" }
+permissions_w = { fg = "#ea6962" }
+permissions_x = { fg = "#a9b665" }
+permissions_s = { fg = "#7daea3" }
+
+[input]
+border   = { fg = "#504945" }
+title    = {}
+value    = {}
+selected = { reversed = true }
+
+[pick]
+border   = { fg = "#504945" }
+active   = { fg = "#1d2021", bg = "#a9b665" }
+inactive = {}
+
+[completion]
+border   = { fg = "#504945" }
+active   = { fg = "#1d2021", bg = "#a9b665" }
+inactive = {}
+
+icon_file    = ""
+icon_folder  = ""
+icon_command = ""
+
+[help]
+on      = { fg = "#a9b665" }
+run     = { fg = "#7daea3" }
+desc    = { fg = "#a89984" }
+hovered = { reversed = true, bold = true }
+footer  = { fg = "#3c3836", bg = "#ebdbb2" }
+
+[filetype]
+rules = [
+  # Code
+  { mime = "text/x-rust",   fg = "#e78a4e" },
+  { mime = "text/x-python", fg = "#d8a657" },
+  { mime = "text/x-lua",    fg = "#7daea3" },
+  { mime = "text/*",        fg = "#ebdbb2" },
+  { mime = "application/json", fg = "#a9b665" },
+
+  # Media
+  { mime = "image/*", fg = "#d3869b" },
+  { mime = "video/*", fg = "#d3869b" },
+  { mime = "audio/*", fg = "#d3869b" },
+
+  # Archives
+  { mime = "application/zip",    fg = "#e78a4e" },
+  { mime = "application/gzip",   fg = "#e78a4e" },
+  { mime = "application/x-tar",  fg = "#e78a4e" },
+  { mime = "application/x-7z-*", fg = "#e78a4e" },
+
+  # Special
+  { name = "*", is = "orphan", bg = "#ea6962" },
+  { name = "*", is = "exec",   fg = "#a9b665" },
+
+  # Fallback
+  { name = "*", fg = "#ebdbb2" },
+  { name = "*/", fg = "#a9b665" },
+]

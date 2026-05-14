@@ -1,0 +1,76 @@
+# Arch first-reboot package list. One package per line; comments are ignored by arch/install.sh.
+git                          # Git 版本控制；也是从 AUR 构建包的基础工具。
+neovim                       # 终端编辑器 `nvim`。
+sudo                         # 让普通用户临时执行管理员命令。
+zsh                          # 交互式 shell；Arch baseline 只用 bare zsh。
+tmux                         # 终端会话复用，断线/多窗口工作流。
+fzf                          # 命令行模糊搜索工具。
+openssh                      # SSH 客户端/服务端，用于拉 Git repo 和远程登录。
+rsync                        # 增量复制/备份文件。
+rclone                       # R2/S3/云存储检查与同步工具；给 Star storage 做独立验收。
+curl                         # HTTP 下载与 API 调试工具。
+wget                         # 简单文件下载工具。
+ffmpeg                       # Whisper 读取/转码音频必需；openai-whisper 调用它处理 wav/mp3 等输入。
+dbus                         # 用户 session bus；Sway、通知、输入法都依赖它。
+base-devel                   # AUR/native build 基础开发工具组。
+clang                        # C/C++/libclang 工具链；Rust bindgen 与 native FFI 需要。
+cmake                        # 常见 native/Rust/Python 依赖的构建系统。
+gdb                          # C/Rust 原生程序调试器。
+just                         # 项目命令 runner。
+btrfs-progs                  # Btrfs 文件系统管理工具。
+snapper                      # Btrfs 快照管理。
+snap-pac                     # pacman 安装/升级前后自动创建 Snapper 快照。
+grub-btrfs                   # 在 GRUB 中显示 Btrfs 快照启动菜单。
+inotify-tools                # 文件变化监听，供 grub-btrfsd 等工具使用。
+networkmanager               # 网络管理服务，负责 WiFi/有线网络连接。
+ufw                          # 简化版防火墙配置工具。
+bluez                        # Linux Bluetooth 协议栈。
+bluez-utils                  # `bluetoothctl` 等 Bluetooth 管理命令。
+pipewire                     # 现代音频/视频管线基础服务。
+pipewire-pulse               # PulseAudio 兼容层，让旧应用走 PipeWire。
+pipewire-alsa                # ALSA 兼容层。
+wireplumber                  # PipeWire 会话管理器。
+alsa-utils                   # `alsamixer`、`speaker-test` 等音频诊断工具。
+pavucontrol                  # GUI 音频路由/输入输出选择器；排查 Bluetooth mic/sink 时有用。
+pamixer                      # 命令行调节 PulseAudio/PipeWire 音量。
+sway                         # Wayland 窗口管理器。
+foot                         # Wayland 原生终端。
+mako                         # Wayland 通知 daemon。
+libnotify                    # 提供 `notify-send`，用于音量/亮度等临时通知。
+grim                         # Wayland 截图工具。
+slurp                        # 选择屏幕区域，常与 `grim` 配合截图。
+wl-clipboard                 # Wayland 剪贴板命令行工具。
+brightnessctl                # 调节屏幕/键盘背光亮度。
+wlr-randr                    # Wayland 输出/显示器配置工具。
+wev                          # Wayland 输入事件查看器，用于查键盘鼠标事件。
+usbutils                     # `lsusb` 等 USB 设备诊断工具。
+pciutils                     # `lspci` 等 PCI 设备诊断工具。
+lm_sensors                   # `sensors`/`pwmconfig`/`fancontrol`；硬件支持时可控风扇。
+ttf-jetbrains-mono-nerd      # 主字体：JetBrains Mono Nerd Font。
+noto-fonts-cjk               # 中文 fallback 字体。
+noto-fonts-emoji             # Emoji fallback 字体。
+fcitx5                       # Fcitx5 输入法框架。
+fcitx5-configtool            # Fcitx5 图形配置工具。
+fcitx5-gtk                   # GTK 应用中的 Fcitx5 输入支持。
+fcitx5-qt                    # Qt 应用中的 Fcitx5 输入支持。
+fcitx5-chinese-addons        # Fcitx5 中文输入法插件。
+fcitx5-rime                  # Fcitx5 的 Rime 输入法后端。
+rime-luna-pinyin             # Rime 明月拼音方案。
+lf                           # 终端文件管理器。
+bat                          # 带语法高亮的 `cat` 替代品。
+eza                          # 现代 `ls` 替代品。
+fd                           # 现代 `find` 替代品。
+ripgrep                      # 快速全文搜索 `rg`。
+jq                           # JSON 命令行处理工具。
+poppler                      # PDF/文档预览工具集；供 lf preview 使用。
+unzip                        # 解压 `.zip` 文件。
+7zip                         # 官方 7-Zip CLI。
+unrar                        # 解压 `.rar` 文件。
+highlight                    # 代码高亮工具，供预览脚本使用。
+python                       # Python 运行时。
+python-pip                   # Python 包安装工具；只作兜底。
+uv                           # 快速 Python env/package/tool 管理器。
+python-poetry                # Poetry CLI；兼容已有项目命令。
+rustup                       # Rust toolchain 管理器。
+nodejs                       # Node.js 运行时。
+npm                          # Node.js 包管理器。

@@ -2,7 +2,7 @@
 # arch+i3 version for pi4
 
 sudo pacman -Syu
-sudo pacman -S ranger zsh curl git vim fzf htop xcape tmux ctags neofetch python-pip zip unzip cmake make gcc jupyter-notebook
+sudo pacman -S ranger zsh curl git vim fzf htop xcape tmux ctags python-pip zip unzip cmake make gcc jupyter-notebook
 sudo pacman -S xorg-server xorg-xinit xorg-server-utils xf86-video-fbdev xorg-refresh i3-wm i3status
 sudo pacman -S chromium xfce4-terminal nautilus w3m lxappearance_obconf scrot compton feh rofi
 sudo pacman -S ttf-dejavu ttf-fira-mono noto-fonts-cjk # en and cn fonts, reboot after installing

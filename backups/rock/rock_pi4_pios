@@ -5,7 +5,7 @@
 sudo apt update
 sudo apt upgrade
 # sudo apt install net-tools network-manager # no nmcli, use sudo raspi-config
-sudo apt install ranger zsh curl git vim vim-gtk3 fzf htop xcape tmux ctags neofetch zip unzip
+sudo apt install ranger zsh curl git vim vim-gtk3 fzf htop xcape tmux ctags zip unzip
 sudo apt install python-pip build-essential cmake make gcc jupyter-notebook
 
 # sudo apt install xorg chromium # only for clean version

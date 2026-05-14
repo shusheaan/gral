@@ -1,0 +1,139 @@
+# Arch Linux zsh config managed by ~/GitHub/gral/arch.
+
+# Prompt / colors.
+autoload -U colors && colors
+PS1="%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[red]%}]%{$reset_color%}$%b "
+
+# Completion.
+autoload -U compinit promptinit
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' menu select
+zmodload zsh/complist
+compinit
+_comp_options+=(globdots)
+
+# Vi mode.
+bindkey -v
+export KEYTIMEOUT=1
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+bindkey -v '^?' backward-delete-char
+
+# Basic environment.
+export LANG=en_US.UTF-8
+export EDITOR=nvim
+export VISUAL=nvim
+export TERM=xterm-256color
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+export RUST_BACKTRACE=full
+
+# Python cache hygiene.
+export MYPY_CACHE_DIR="$HOME/.cache/mypy"
+export PYTHONPYCACHEPREFIX="$HOME/.cache/pycache"
+export RUFF_CACHE_DIR="$HOME/.cache/ruff"
+
+# Bare zsh baseline: no Oh My Zsh or plugin manager in the first Arch version.
+
+# Auto attach tmux only for SSH sessions.
+if command -v tmux >/dev/null 2>&1; then
+  if [ -n "${SSH_CONNECTION:-}" ] && [ -z "${TMUX:-}" ] && [ -t 1 ]; then
+    exec tmux new-session -A -s work
+  fi
+fi
+
+# System / desktop.
+alias yo='sudo pacman -Syu'
+alias refresh='source ~/.zshrc'
+alias gc='google-chrome-stable'
+alias bt='bluetoothctl'
+alias sus='systemctl suspend'
+alias mute='pamixer -t'
+alias unmute='pamixer --unmute'
+alias vol='pamixer --get-volume'
+alias citrix='/opt/Citrix/ICAClient/wfica'
+
+# tmux.
+alias tls='tmux ls'
+alias tatt='tmux attach -t'
+alias tdet='tmux detach -t'
+alias ttk='tmux kill-server'
+alias ttr='tmux resize-pane -R 20'
+alias ttl='tmux resize-pane -L 20'
+
+_tnew_attach() {
+  if [ -n "${TMUX:-}" ]; then
+    tmux switch-client -t "=$1"
+  else
+    tmux attach-session -t "=$1"
+  fi
+}
+
+tnew() {
+  if [ $# -ne 1 ]; then
+    echo "usage: tnew <session>" >&2
+    return 2
+  fi
+
+  local session="$1"
+  local -a size_args
+  local width="${COLUMNS:-}"
+  local height="${LINES:-}"
+
+  size_args=()
+
+  if [ -n "${TMUX:-}" ]; then
+    width="$(tmux display-message -p '#{client_width}')" || return
+    height="$(tmux display-message -p '#{client_height}')" || return
+  fi
+
+  if [[ "$width" = <-> && "$height" = <-> ]]; then
+    size_args=(-x "$width" -y "$height")
+  fi
+
+  if tmux has-session -t "=$session" 2>/dev/null; then
+    _tnew_attach "$session"
+    return
+  fi
+
+  tmux new-session -d -s "$session" "${size_args[@]}" || return
+  _tnew_attach "$session"
+}
+
+# lf: cd to last directory after quitting.
+lfcd () {
+    local tmp
+    tmp="$(mktemp)"
+    lf -last-dir-path="$tmp" "$@"
+    if [ -f "$tmp" ]; then
+        local dir
+        dir="$(cat "$tmp")"
+        rm -f "$tmp"
+        if [ -d "$dir" ] && [ "$dir" != "$(pwd)" ]; then
+            cd "$dir"
+        fi
+    fi
+}
+alias lf=lfcd
+
+# Development shortcuts.
+alias ct='cargo test -- --nocapture'
+alias cb='cargo build && rust-gdb "$PWD/target/debug/$(basename "$PWD")" --silent'
+alias jl='julia --project=.'
+alias cm='cmatrix -C cyan'
+alias cc='claude'
+alias ca='claude agents'
+
+# Node/Bun optional setup.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Git shortcuts.
+alias ga='git add -A'
+alias gm='git commit -m'
+alias gp='git push origin'
+alias gs='git status'

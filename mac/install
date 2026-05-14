@@ -1,28 +1,57 @@
-GRAL=$(pwd)
+#!/usr/bin/env zsh
+set -euo pipefail
 
-ln -sf $GRAL/tmux.conf $HOME/.tmux.conf
-ln -sf $GRAL/zshrc $HOME/.zshrc
-mkdir -p ~/.oh-my-zsh/custom/themes
-ln -sf $GRAL/custom.zsh-theme $HOME/.oh-my-zsh/custom/themes/custom.zsh-theme
+# mac/install links this Mac to the Mac-frozen snapshot under ./mac.
+# Keep Linux/Arch config work out of the live macOS dotfiles.
+MAC="${0:A:h}"
+GRAL="${MAC:h}"
+link_managed_path() {
+    local source="$1"
+    local target="$2"
 
-# Vim (minimal fallback)
-ln -sf $GRAL/vimrc $HOME/.vimrc
+    mkdir -p "$(dirname "$target")"
 
-# Neovim (main editor — entire directory)
-rm -rf $HOME/.config/nvim
-ln -sf $GRAL/nvim $HOME/.config/nvim
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        mv "$target" "$target.backup.$(date +%Y%m%d%H%M%S)"
+    fi
 
-# Yazi file manager
-mkdir -p $HOME/.config/yazi
-ln -sf $GRAL/yazi/yazi.toml $HOME/.config/yazi/yazi.toml
-ln -sf $GRAL/yazi/keymap.toml $HOME/.config/yazi/keymap.toml
-ln -sf $GRAL/yazi/theme.toml $HOME/.config/yazi/theme.toml
+    ln -sfn "$source" "$target"
+}
 
-# Workmux (legacy; disabled after native agent panels)
-# mkdir -p $HOME/.config/workmux
-# ln -sf $GRAL/workmux/config.yaml $HOME/.config/workmux/config.yaml
+# Shell / terminal session.
+link_managed_path "$MAC/zshrc" "$HOME/.zshrc"
+link_managed_path "$MAC/tmux.conf" "$HOME/.tmux.conf"
+link_managed_path "$MAC/custom.zsh-theme" "$HOME/.oh-my-zsh/custom/themes/custom.zsh-theme"
 
-# lf (legacy, kept for reference)
-mkdir -p $HOME/.config/lf
-ln -sf $GRAL/lfrc $HOME/.config/lf/lfrc
-ln -sf $GRAL/pv.sh $HOME/.config/lf/pv.sh
+# macOS/X11 legacy pieces that are currently linked on this Mac.
+link_managed_path "$MAC/xinitrc" "$HOME/.xinitrc"
+link_managed_path "$MAC/xmodmap.sh" "$HOME/.xmodmap.sh"
+link_managed_path "$MAC/xmodmap.conf" "$HOME/.xmodmap.conf"
+
+# Vim fallback.
+link_managed_path "$GRAL/nvim/vimrc" "$HOME/.vimrc"
+
+# Neovim frozen for macOS.
+link_managed_path "$MAC/nvim" "$HOME/.config/nvim"
+
+# Yazi file manager.
+link_managed_path "$MAC/yazi/yazi.toml" "$HOME/.config/yazi/yazi.toml"
+link_managed_path "$MAC/yazi/keymap.toml" "$HOME/.config/yazi/keymap.toml"
+link_managed_path "$MAC/yazi/theme.toml" "$HOME/.config/yazi/theme.toml"
+
+# lf file manager: match the links currently active on this Mac.
+link_managed_path "$GRAL/lf/lfrc" "$HOME/.config/lf/lfrc"
+link_managed_path "$GRAL/lf/preview.sh" "$HOME/.config/lf/preview.sh"
+link_managed_path "$GRAL/lf/pv.sh" "$HOME/.config/lf/pv.sh"
+
+# Legacy desktop configs currently linked on this Mac.
+link_managed_path "$MAC/i3.conf" "$HOME/.config/i3/config"
+link_managed_path "$MAC/alacritty.yml" "$HOME/.config/alacritty/alacritty.yml"
+
+# Claude/Codex AI agents, skills, hooks, rules, and shared instructions.
+"$GRAL/sync-ai"
+
+cat <<'MSG'
+Linked macOS dotfiles from ./mac.
+Mac-frozen links point to ./mac; nvim/vimrc, lf, claude, and codex remain shared from repo root.
+MSG
