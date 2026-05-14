@@ -1,10 +1,14 @@
-# Arch Linux zsh config managed by ~/GitHub/gral/arch.
+# Arch Linux zsh config managed by ~/work/gral/arch.
 
 # Prompt / colors.
 autoload -U colors && colors
 PS1="%B%{$fg[red]%}[%{$fg[yellow]%}%n%{$fg[green]%}@%{$fg[blue]%}%M %{$fg[magenta]%}%~%{$fg[red]%}]%{$reset_color%}$%b "
 
 # Completion.
+if [ -d /usr/share/zsh/site-functions ]; then
+  fpath=(/usr/share/zsh/site-functions $fpath)
+fi
+
 autoload -U compinit promptinit
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' menu select
@@ -35,6 +39,11 @@ export PYTHONPYCACHEPREFIX="$HOME/.cache/pycache"
 export RUFF_CACHE_DIR="$HOME/.cache/ruff"
 
 # Bare zsh baseline: no Oh My Zsh or plugin manager in the first Arch version.
+# Lightweight plugins are loaded directly from Arch packages; no Oh My Zsh required.
+if [ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
 
 # Auto attach tmux only for SSH sessions.
 if command -v tmux >/dev/null 2>&1; then
@@ -48,11 +57,47 @@ alias yo='sudo pacman -Syu'
 alias refresh='source ~/.zshrc'
 alias gc='google-chrome-stable'
 alias bt='bluetoothctl'
-alias sus='systemctl suspend'
 alias mute='pamixer -t'
 alias unmute='pamixer --unmute'
 alias vol='pamixer --get-volume'
 alias citrix='/opt/Citrix/ICAClient/wfica'
+
+exitsway() {
+  if command -v swaymsg >/dev/null 2>&1 && swaymsg exit 2>/dev/null; then
+    return 0
+  fi
+
+  local socket
+  socket="$(ls /run/user/"$UID"/sway-ipc.*.sock 2>/dev/null | head -n 1)"
+  if [ -z "$socket" ]; then
+    echo "No Sway IPC socket found under /run/user/$UID." >&2
+    return 1
+  fi
+
+  SWAYSOCK="$socket" swaymsg exit
+}
+
+# Start Sway as the whole local login session.
+# Because this uses `exec`, Mod+Shift+Q exits Sway back to the TTY login prompt,
+# not to an already-unlocked shell. The tmux server stays detached.
+sway() {
+  if [ -n "${SSH_CONNECTION:-}" ]; then
+    echo "Refusing to start Sway from SSH." >&2
+    return 1
+  fi
+
+  if [ -n "${TMUX:-}" ]; then
+    echo "Start Sway from the bare TTY login shell, not inside tmux." >&2
+    return 1
+  fi
+
+  if [ ! -x /usr/bin/sway ]; then
+    echo "sway is not installed at /usr/bin/sway" >&2
+    return 1
+  fi
+
+  exec /usr/bin/sway "$@"
+}
 
 # tmux.
 alias tls='tmux ls'
@@ -137,3 +182,8 @@ alias ga='git add -A'
 alias gm='git commit -m'
 alias gp='git push origin'
 alias gs='git status'
+
+# zsh-syntax-highlighting should be sourced near the end of .zshrc.
+if [ -r /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi

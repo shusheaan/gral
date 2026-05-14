@@ -30,8 +30,8 @@ exec $browser
 
 input * {
     xkb_layout us
-    repeat_delay 300
-    repeat_rate 30
+    repeat_delay 150
+    repeat_rate 60
 }
 
 # Floating two-window layout. Tune pixel sizes/positions after checking your real monitor size.
@@ -55,6 +55,9 @@ bindsym $mod+f fullscreen toggle
 bindsym $mod+space floating toggle
 bindsym $mod+q kill
 bindsym $mod+r reload
+
+# Exit the whole local GUI session. Because arch/zshrc starts Sway with `exec`,
+# this returns to the TTY login prompt; Foot/Chrome close and tmux stays detached.
 bindsym $mod+Shift+q exit
 bindsym $mod+Shift+s exec sh -c 'mkdir -p "$HOME/Pictures/Screenshots"; grim -g "$(slurp)" "$HOME/Pictures/Screenshots/$(date +%Y%m%d-%H%M%S).png"'
 

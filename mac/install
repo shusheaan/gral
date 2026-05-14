@@ -18,6 +18,15 @@ link_managed_path() {
     ln -sfn "$source" "$target"
 }
 
+configure_neural_keyboard_repeat() {
+    # macOS repeat units are ~15 ms ticks:
+    # InitialKeyRepeat=10 ~= 150 ms before repeat starts.
+    # KeyRepeat=1 ~= 15 ms between repeats, the practical fastest setting.
+    defaults write -g ApplePressAndHoldEnabled -bool false
+    defaults write -g InitialKeyRepeat -int 10
+    defaults write -g KeyRepeat -int 1
+}
+
 # Shell / terminal session.
 link_managed_path "$MAC/zshrc" "$HOME/.zshrc"
 link_managed_path "$MAC/tmux.conf" "$HOME/.tmux.conf"
@@ -51,7 +60,14 @@ link_managed_path "$MAC/alacritty.yml" "$HOME/.config/alacritty/alacritty.yml"
 # Claude/Codex AI agents, skills, hooks, rules, and shared instructions.
 "$GRAL/sync-ai"
 
+# System feel: wired-mechanical-keyboard, editor-first latency.
+configure_neural_keyboard_repeat
+
 cat <<'MSG'
 Linked macOS dotfiles from ./mac.
 Mac-frozen links point to ./mac; nvim/vimrc, lf, claude, and codex remain shared from repo root.
+macOS keyboard repeat set to neural-direct mode:
+  ApplePressAndHoldEnabled=false
+  InitialKeyRepeat=10
+  KeyRepeat=1
 MSG

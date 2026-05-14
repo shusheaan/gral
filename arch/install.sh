@@ -38,6 +38,11 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
+if [ "$(id -u)" -eq 0 ]; then
+    echo "Run arch/install.sh as your normal user, not root. It uses sudo for pacman, and AUR/makepkg refuses root."
+    exit 1
+fi
+
 install_packages() {
     local package_file="$ARCH/packages.txt"
     local -a packages
@@ -64,14 +69,72 @@ install_packages() {
     fi
 
     echo "Installing ${#packages[@]} packages from $package_file"
-    if [ "$(id -u)" -eq 0 ]; then
-        pacman -Syu --needed "${packages[@]}"
+    sudo pacman -Syu --needed "${packages[@]}"
+}
+
+install_google_chrome() {
+    local aur_root="${XDG_CACHE_HOME:-$HOME/.cache}/gral-aur"
+    local package_dir="$aur_root/google-chrome"
+
+    if [ "${GRAL_SKIP_AUR:-0}" = "1" ] || [ "${GRAL_SKIP_CHROME:-0}" = "1" ]; then
+        echo "Skipping Google Chrome AUR install because GRAL_SKIP_AUR=1 or GRAL_SKIP_CHROME=1."
+        return
+    fi
+
+    if command -v google-chrome-stable >/dev/null 2>&1; then
+        echo "Google Chrome already installed: $(command -v google-chrome-stable)"
+        return
+    fi
+
+    for cmd in git makepkg sudo; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            echo "Cannot install Google Chrome; missing command: $cmd" >&2
+            return 1
+        fi
+    done
+
+    mkdir -p "$aur_root" || return 1
+    if [ -d "$package_dir/.git" ]; then
+        git -C "$package_dir" pull --ff-only || return 1
+    elif [ -e "$package_dir" ]; then
+        echo "AUR path exists but is not a git checkout: $package_dir" >&2
+        echo "Move it away manually, then rerun ./arch/install.sh." >&2
+        return 1
     else
-        sudo pacman -Syu --needed "${packages[@]}"
+        git clone https://aur.archlinux.org/google-chrome.git "$package_dir" || return 1
+    fi
+
+    (
+        cd "$package_dir"
+        makepkg -si --noconfirm
+    ) || return 1
+}
+
+install_system_policy() {
+    local logind_conf="$ARCH/systemd/logind.conf.d/10-gral-session.conf"
+
+    if [ -r "$logind_conf" ]; then
+        sudo install -Dm644 "$logind_conf" /etc/systemd/logind.conf.d/10-gral-session.conf
+        sudo systemctl reload systemd-logind.service 2>/dev/null || \
+            echo "systemd-logind reload failed; reboot will apply /etc/systemd/logind.conf.d/10-gral-session.conf"
+    fi
+}
+
+enable_system_services() {
+    if command -v systemctl >/dev/null 2>&1; then
+        sudo systemctl enable --now NetworkManager.service || true
+        sudo systemctl enable --now sshd.service || true
+        sudo systemctl enable --now tailscaled.service || true
+    fi
+
+    if command -v loginctl >/dev/null 2>&1; then
+        sudo loginctl enable-linger "$USER" || true
     fi
 }
 
 install_packages
+install_system_policy
+enable_system_services
 
 # Bare zsh as login shell; no Oh My Zsh on the Arch baseline.
 if command -v zsh >/dev/null 2>&1; then
@@ -87,6 +150,11 @@ link_managed_path "$ARCH/tmux.conf" "$HOME/.tmux.conf"
 link_managed_path "$ARCH/tmux-system-status.sh" "$HOME/.local/bin/tmux-system-status.sh"
 link_managed_path "$ARCH/bin/whisper-dictation-setup" "$HOME/.local/bin/whisper-dictation-setup"
 link_managed_path "$ARCH/bin/whisper-dictation-toggle" "$HOME/.local/bin/whisper-dictation-toggle"
+
+# SSH client config for GitHub / RunPod-style remote hosts.
+install -d -m 700 "$HOME/.ssh"
+link_managed_path "$ARCH/ssh/config" "$HOME/.ssh/config"
+chmod 700 "$HOME/.ssh"
 
 # Vim / Neovim.
 link_managed_path "$GRAL/nvim/vimrc" "$HOME/.vimrc"
@@ -137,11 +205,25 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service || true
 fi
 
+if [ "${GRAL_SKIP_AUR:-0}" = "1" ] || [ "${GRAL_SKIP_CHROME:-0}" = "1" ]; then
+    chrome_status="skipped"
+else
+    chrome_status="ready"
+    if ! install_google_chrome; then
+        chrome_status="failed; rerun: cd ~/.cache/gral-aur/google-chrome && makepkg -si"
+    fi
+fi
+
 cat <<MSG
 Installed Arch package list and linked dotfiles from ./arch.
+Google Chrome AUR status: $chrome_status
 Next:
-  1. source ~/.zprofile
-  2. test terminal tools: zsh, tmux, nvim, lf
-  3. log out/in if chsh changed your shell
-  4. start GUI manually when needed: sway
+  1. Log out of this TTY, then log back in once so ~/.zprofile and the zsh login shell are clean.
+  2. Start GUI manually when needed: sway
+  3. Sway should auto-start Foot/tmux and Google Chrome.
+  4. Mod+Shift+Q exits Sway back to the TTY login prompt; tmux sessions stay detached.
+  5. SSH is enabled; attach from another device with: tmux attach -t work
+  6. Tailscale daemon is enabled; authenticate once with: sudo tailscale up --operator="$USER" --qr
+  7. In Tailscale admin, disable key expiry for this machine.
+  8. After Termius-over-Tailscale works, restrict SSH to tailscale0 with UFW per arch/readme.md.
 MSG

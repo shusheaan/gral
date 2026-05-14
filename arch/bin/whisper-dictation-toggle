@@ -31,7 +31,7 @@ start_recording() {
 
     pw-record --rate=16000 --channels=1 "$audio_file" >"$log_file" 2>&1 &
     echo $! > "$pid_file"
-    notify "Whisper" "正在录音；再按 Ctrl+F 停止"
+    notify "Whisper" "Recording... press Ctrl+F again to stop"
 }
 
 transcribe_to_clipboard() {
@@ -40,7 +40,7 @@ transcribe_to_clipboard() {
         [ -x "$python_bin" ] || fail "missing venv; run whisper-dictation-setup first"
         [ -s "$audio_file" ] || fail "recording is empty"
 
-        notify "Whisper" "录音已停止，正在本地转写..."
+        notify "Whisper" "Recording stopped; transcribing locally..."
 
         "$python_bin" - "$audio_file" > "$text_file" <<'PY'
 import os
@@ -70,14 +70,14 @@ print(text)
 PY
 
         if [ ! -s "$text_file" ]; then
-            fail "转写为空"
+            fail "Transcription is empty"
         fi
 
         wl-copy < "$text_file"
         preview="$(tr '\n' ' ' < "$text_file" | cut -c 1-80)"
-        notify "Whisper" "已复制到剪贴板：$preview"
+        notify "Whisper" "Copied to clipboard: $preview"
     } >>"$log_file" 2>&1 || {
-        notify "Whisper" "失败；查看 $log_file"
+        notify "Whisper" "Failed; see $log_file"
         return 1
     }
 }

@@ -1,0 +1,25 @@
+# gral SSH client config for the Arch workstation.
+#
+# Inbound phone access is configured with ~/.ssh/authorized_keys on this machine.
+# This file is for outbound SSH from this machine to GitHub / remote boxes.
+
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+  ServerAliveInterval 30
+  ServerAliveCountMax 3
+
+# RunPod / similar rented GPU hosts:
+# Copy the exact SSH host and port from the provider UI, then add a concrete
+# Host block below. Keep this template commented so install.sh is safe by default.
+#
+# Host runpod-main
+#   HostName <runpod-host-or-ip>
+#   User root
+#   Port <runpod-ssh-port>
+#   IdentityFile ~/.ssh/id_ed25519
+#   IdentitiesOnly yes
+#   ServerAliveInterval 30
+#   ServerAliveCountMax 3
