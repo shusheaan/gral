@@ -1,4 +1,4 @@
 interface:
   display_name: "Project Nav"
-  short_description: "Use work/scratchpad.md as a live project-navigation whiteboard."
-  default_prompt: "项目导航：用 work/scratchpad.md 帮我梳理这个功能的入口、调用顺序、相关测试和可点击源码链接。"
+  short_description: "Use work/scratchpad.md with Neovim-jumpable project locators."
+  default_prompt: "项目导航：用 work/scratchpad.md 帮我梳理这个功能的入口、调用顺序、相关测试和 Neovim 可跳转源码 locator。"

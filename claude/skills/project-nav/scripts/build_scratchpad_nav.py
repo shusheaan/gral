@@ -77,9 +77,6 @@ class Symbol:
     name: str
     signature: str
 
-    def locator(self) -> str:
-        return f"{self.rel_path.as_posix()}:{self.line}:{self.column}"
-
 
 @dataclass(frozen=True)
 class RegexRule:
@@ -89,7 +86,7 @@ class RegexRule:
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Build or check work/scratchpad.md with clickable code navigation links."
+        description="Build or check work/scratchpad.md with Neovim-friendly code navigation locators."
     )
     parser.add_argument(
         "--root",
@@ -123,10 +120,18 @@ def main(argv: Sequence[str]) -> int:
     if not root.exists() or not root.is_dir():
         raise ValueError(f"Root is not a directory: {root}")
 
+    existing = read_optional_text(output)
     symbols = collect_symbols(root)
+    generated = render_generated_section(
+        root=root,
+        output=output,
+        symbols=symbols,
+        start_line=generated_start_line(existing),
+    )
+    validate_generated_section(generated)
     next_text = update_scratchpad(
-        existing=read_optional_text(output),
-        generated=render_generated_section(root, output, symbols),
+        existing=existing,
+        generated=generated,
     )
 
     if args.check:
@@ -147,6 +152,20 @@ def read_optional_text(path: Path) -> str | None:
     if not path.exists():
         return None
     return path.read_text(encoding="utf-8")
+
+
+def generated_start_line(existing: str | None) -> int:
+    if existing is None:
+        return default_scratchpad_prefix().count("\n") + 1
+
+    marker_span = find_generated_span(existing)
+    if marker_span is None:
+        separator = "\n" if existing.endswith("\n") else "\n\n"
+        return (existing + separator).count("\n") + 1
+
+    start, _, _ = marker_span
+    prefix = existing[:start].rstrip() + "\n\n"
+    return prefix.count("\n") + 1
 
 
 def collect_symbols(root: Path) -> tuple[Symbol, ...]:
@@ -391,18 +410,29 @@ def find_generated_span(existing: str) -> tuple[int, int, str] | None:
 
 
 def default_scratchpad(generated: str) -> str:
+    return default_scratchpad_prefix() + f"{generated}\n"
+
+
+def default_scratchpad_prefix() -> str:
     return (
         "# Project Nav — 项目导航白板\n\n"
         "这个文件用于用户和 agent 协作梳理项目结构、功能入口、调用顺序、测试编排和架构知识。"
         "自由编辑 `## 交互记录`；自动导航图只更新标记之间的内容。\n\n"
         "## 交互记录\n\n"
         "- 待补充：当前想看的功能、入口、测试、疑问、下一步导航路线。\n\n"
-        f"{generated}\n"
     )
 
 
-def render_generated_section(root: Path, output: Path, symbols: Sequence[Symbol]) -> str:
+def render_generated_section(
+    root: Path,
+    output: Path,
+    symbols: Sequence[Symbol],
+    start_line: int,
+) -> str:
     source_files = len({symbol.rel_path for symbol in symbols})
+    symbol_groups = group_symbols(symbols)
+    section_line_placeholders: list[tuple[int, int]] = []
+    section_locators: dict[int, str] = {}
     lines = [
         BEGIN_MARKER,
         "## 自动生成项目符号索引",
@@ -414,8 +444,8 @@ def render_generated_section(root: Path, output: Path, symbols: Sequence[Symbol]
         "",
         "### 使用方式",
         "",
-        "- 点击 symbol 名称跳到定义行（Markdown 预览 / GitHub-style renderer）。",
-        "- 复制 locator（`path:line:column`）给 agent 或编辑器命令打开精确位置。",
+        "- Neovim：把光标放在裸 locator（`../path:line:column`）上，用 `gF`（或你的 `gd` 映射）跳到定义。",
+        "- locator 相对 `work/scratchpad.md`；它是主导航入口，不依赖 Markdown 预览或鼠标点击。",
         "- 代码移动后，重新运行 `python3 claude/skills/project-nav/scripts/build_scratchpad_nav.py --root .`。",
         "- 这个索引用来找全局入口；具体功能解释写在上面的 `## 交互记录`。",
         "",
@@ -423,27 +453,55 @@ def render_generated_section(root: Path, output: Path, symbols: Sequence[Symbol]
         "",
     ]
 
-    for rel_path, file_symbols in group_symbols(symbols):
-        anchor = file_anchor(rel_path)
-        lines.append(f"- [{rel_path.as_posix()}](#{anchor}) — {len(file_symbols)} symbols")
+    for index, (rel_path, file_symbols) in enumerate(symbol_groups):
+        locator = relative_locator(output, root, rel_path, 1, 1)
+        placeholder = f"__PROJECT_NAV_SECTION_{index}__"
+        section_line_placeholders.append((len(lines), index))
+        lines.append(
+            f"{locator} — {rel_path.as_posix()} — {len(file_symbols)} symbols — section {placeholder}"
+        )
 
     lines.extend(["", "### Symbols by file", ""])
 
-    for rel_path, file_symbols in group_symbols(symbols):
-        lines.append(f'<a id="{file_anchor(rel_path)}"></a>')
+    for index, (rel_path, file_symbols) in enumerate(symbol_groups):
+        section_line = start_line + len(lines)
+        section_locators[index] = relative_self_locator(output, root, section_line, 1)
         lines.append(f"#### {rel_path.as_posix()}")
         lines.append("")
         for symbol in file_symbols:
-            link = relative_markdown_link(output, root, symbol.rel_path, symbol.line)
             lines.append(
-                f"- `{symbol.kind}` [{symbol.name}]({link}) · `{symbol.locator()}`"
+                f"{relative_symbol_locator(output, root, symbol)} — `{symbol.kind}` {symbol.name}"
             )
             if symbol.signature:
-                lines.append(f"  - `{symbol.signature}`")
+                lines.append(f"  signature: `{symbol.signature}`")
         lines.append("")
 
     lines.append(END_MARKER)
+    for line_index, section_index in section_line_placeholders:
+        lines[line_index] = lines[line_index].replace(
+            f"__PROJECT_NAV_SECTION_{section_index}__",
+            section_locators[section_index],
+        )
     return "\n".join(lines)
+
+
+def validate_generated_section(generated: str) -> None:
+    forbidden_patterns = (
+        re.compile(r"\[[^\]]+\]\([^)]+\)"),
+        re.compile(r"<a\s+id=", re.IGNORECASE),
+        re.compile(r"\bsection\s+#"),
+    )
+    bad_lines: list[str] = []
+    for line_number, line in enumerate(generated.splitlines(), start=1):
+        if any(pattern.search(line) for pattern in forbidden_patterns):
+            bad_lines.append(f"{line_number}: {line}")
+
+    if bad_lines:
+        raise ValueError(
+            "Generated section contains Markdown-only navigation targets; "
+            "use gd-jumpable path:line:column locators instead:\n"
+            + "\n".join(bad_lines)
+        )
 
 
 def group_symbols(symbols: Sequence[Symbol]) -> tuple[tuple[Path, tuple[Symbol, ...]], ...]:
@@ -465,10 +523,24 @@ def group_symbols(symbols: Sequence[Symbol]) -> tuple[tuple[Path, tuple[Symbol, 
     return tuple(groups)
 
 
-def relative_markdown_link(output: Path, root: Path, target_rel_path: Path, line: int) -> str:
+def relative_symbol_locator(output: Path, root: Path, symbol: Symbol) -> str:
+    return relative_locator(output, root, symbol.rel_path, symbol.line, symbol.column)
+
+
+def relative_self_locator(output: Path, root: Path, line: int, column: int) -> str:
+    return relative_locator(output, root, output.relative_to(root), line, column)
+
+
+def relative_locator(
+    output: Path,
+    root: Path,
+    target_rel_path: Path,
+    line: int,
+    column: int,
+) -> str:
     output_dir_rel = output.parent.resolve().relative_to(root)
     relative_path = relative_posix_path(output_dir_rel, target_rel_path)
-    return f"{relative_path}#L{line}"
+    return f"{relative_path}:{line}:{column}"
 
 
 def relative_posix_path(from_dir: Path, to_path: Path) -> str:
@@ -486,12 +558,6 @@ def relative_posix_path(from_dir: Path, to_path: Path) -> str:
     if not up_parts and not down_parts:
         return "."
     return PurePosixPath(*up_parts, *down_parts).as_posix()
-
-
-def file_anchor(rel_path: Path) -> str:
-    cleaned = re.sub(r"[^a-z0-9_-]+", "-", rel_path.as_posix().lower())
-    return "nav-" + cleaned.strip("-")
-
 
 if __name__ == "__main__":
     try:

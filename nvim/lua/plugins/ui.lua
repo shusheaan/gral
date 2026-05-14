@@ -143,9 +143,9 @@ return {
 
       local function git_branch_color()
         if git_state.dirty or git_state.ahead > 0 or not git_state.has_upstream then
-          return { fg = "#d8a657" }
+          return { fg = "#d8a657", gui = "bold" }
         end
-        return { fg = "#a9b665" }
+        return { fg = "#a9b665", gui = "bold" }
       end
 
       local function compact_path(path)
