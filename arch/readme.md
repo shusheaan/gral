@@ -18,7 +18,7 @@
 
 - 不装 Display Manager：开机只到 TTY，手动 `sway`，少一层 GUI login stack。
 - `arch/zshrc` 用 `exec /usr/bin/sway` 启动 GUI：退出 Sway 后直接回 TTY login prompt，不留下已解锁 shell。
-- Sway 单 workspace、无 bar block、无 swaybar、无壁纸、纯黑背景、无桌面特效；状态放在 `tmux`，不让桌面层持续刷新。
+- Sway 单 workspace、无 bar block、无 swaybar、无壁纸、Gruvbox dark hard 背景、无桌面特效；状态放在 `tmux`，不让桌面层持续刷新。
 - Foot 是唯一 terminal，直接进入 `tmux new-session -A -s work`。
 - Chromium 是默认浏览器，走官方 pacman 包，不走 AUR；启动参数强制 Wayland 和 dark UI：`chromium --ozone-platform=wayland --force-dark-mode --enable-features=WebUIDarkMode`。
 - Keyboard repeat 已按激进交互调优：`repeat_delay 120`、`repeat_rate 80`。如果误触太多，再退回 `150/60`。
@@ -45,7 +45,7 @@ output DP-1 mode 2560x1440@144Hz
 
 - `install.sh`：第一次重启后安装 `arch/packages.txt`，再 link Arch 配置。
 - `packages.txt`：首轮 pacman 包清单；避免在 `archinstall` 里手打长 list。
-- `sway/config`：单工作区 Foot + Chromium 配置；启动后调用 `bin/sway-workbench-layout` 按真实显示器尺寸摆放 floating 窗口，包含方向键/移动/resize、Gruvbox border、纯黑背景、无 swaybar、音量/亮度通知。
+- `sway/config`：单工作区 Foot + Chromium 配置；启动后调用 `bin/sway-workbench-layout` 按真实显示器尺寸摆放 floating 窗口，包含方向键/移动/resize、Gruvbox border、Gruvbox dark hard 背景、无 swaybar、音量/亮度通知。
 - `foot/foot.ini`：Foot 终端配置；Gruvbox dark medium，与 `nvim/lua/plugins/colorscheme.lua` 保持一致。
 - `mako/config`：通知样式。
 - `environment.d/90-fcitx5.conf`：输入法环境变量。
@@ -554,16 +554,16 @@ pavucontrol
 Sway 不启动 `swaybar`，唯一常驻状态栏是 Foot 里的 tmux bottom bar。Arch status-right 由 `arch/tmux-system-status.sh` 提供，顺序固定为：
 
 ```text
-CPU负载/CPU温度  GPU负载/GPU温度  月-日 时:分
+CPU负载/CPU温度  GPU负载/GPU温度  内存用量  月-日 时:分
 ```
 
 例子：
 
 ```text
-07%/48°  23%/55°  05-15 14:32
+07%/48°  23%/55°  18.4G  05-15 14:32
 ```
 
-电池信息已移除。CPU 或 GPU 任一负载超过 `90%`，或温度超过 `60°`，对应的 `负载/温度` 整组会变成和 Nvim dirty/ahead branch 相同的橙色 `#d8a657`。GPU 数据优先读 `nvidia-smi --query-gpu=utilization.gpu,temperature.gpu`；如果还没安装 NVIDIA driver / `nvidia-utils`，会显示 `--%/--°`，不影响 tmux 启动。Mac 的 tmux status 使用同一阈值和颜色逻辑显示 CPU，并保留原来的电池百分比。
+电池信息已移除。CPU 或 GPU 任一负载超过 `90%`，或温度超过 `60°`，对应的 `负载/温度` 整组会变成和 Nvim dirty/ahead branch 相同的橙色 `#d8a657`。GPU 数据优先读 `nvidia-smi --query-gpu=utilization.gpu,temperature.gpu`；如果还没安装 NVIDIA driver / `nvidia-utils`，会显示 `--%/--°`，不影响 tmux 启动。内存用量优先读 Linux `free`，Mac fallback 到 `vm_stat`。
 
 ## Zsh completion / plugins
 
@@ -577,7 +577,7 @@ CPU负载/CPU温度  GPU负载/GPU温度  月-日 时:分
 
 ## Sway 配置
 
-实际配置只维护在 `arch/sway/config`。工作模型是一个 workspace，两个 floating app：Foot/tmux 与 Chromium；Sway 只负责启动、摆放、切换、移动/resize、音量/亮度通知；不启动 swaybar，不设置壁纸，背景固定纯黑，常驻状态放在 `tmux`。
+实际配置只维护在 `arch/sway/config`。工作模型是一个 workspace，两个 floating app：Foot/tmux 与 Chromium；Sway 只负责启动、摆放、切换、移动/resize、音量/亮度通知；不启动 swaybar，不设置壁纸，背景固定为 Gruvbox dark hard，常驻状态放在 `tmux`。
 
 首次进入后检查真实 app id/class：
 
@@ -646,33 +646,15 @@ cd ~/work/gral
 
 - 系统层：通过 `pacman` 安装 `nvidia-open-dkms`、`nvidia-utils`、`opencl-nvidia`、`cuda`、`cudnn`、`nccl`，并按已安装 kernel 自动补 `linux-headers` / `linux-lts-headers`。
 - Arch Python 层：安装 `python-pytorch-cuda`、`python-openai-whisper`、`python-polars`、`pytest`/`hypothesis`、`mypy`、`ruff` 等机器级 Python 基础包。
-- 共享 venv 层：创建 `/opt/gral-python-gpu`，使用 `--system-site-packages` 读取 Arch 的 CUDA PyTorch，再用 `uv` 安装 `openmm[cuda13]`。如果 OpenMM 的 CUDA 13 wheel 有兼容问题，可改用：
+- 用户 helper 层：写入 `~/.local/bin/python-gpu` 和 `~/.local/bin/torch-test-gpu`；不创建共享 Python venv。
 
-  ```sh
-  GRAL_OPENMM_CUDA_EXTRA=cuda12 ./arch/python-gpu-dev.sh
-  ```
-
-脚本还会写入：
-
-```text
-~/.config/environment.d/92-gral-python-gpu.conf
-```
-
-里面设置：
-
-```sh
-GRAL_PYTHON_GPU_VENV=/opt/gral-python-gpu
-WHISPER_VENV=/opt/gral-python-gpu
-```
-
-所以重新登录后，Sway 里的 `whisper-dictation-toggle` 会直接用共享 GPU Python，不再走每个用户目录里的 CPU fallback venv。
+当前策略是优先使用 Arch system Python。脚本会删除旧版本遗留的 `~/.config/environment.d/92-gral-python-gpu.conf`，避免 `WHISPER_VENV` 继续指向已经不维护的共享 venv。GPU baseline 配好后，`whisper-dictation-toggle` 会因为 system Python 已能 `import torch` / `import whisper`，自动走系统 Python。
 
 常用验证：
 
 ```sh
 nvidia-smi
 torch-test-gpu
-python-gpu -m openmm.testInstallation
 python-gpu -c 'import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))'
 ```
 
@@ -680,7 +662,7 @@ python-gpu -c 'import torch; print(torch.cuda.is_available(), torch.cuda.get_dev
 
 - 如果脚本刚安装了 NVIDIA driver/DKMS，先 reboot 一次再判断 CUDA 是否正常；第一次运行时 `nvidia-smi` 失败通常只是 kernel module 还没加载。
 - 默认会预下载 `WHISPER_MODEL`（缺省 `large-v3`）。不想下载模型可用 `GRAL_SKIP_WHISPER_PREFETCH=1 ./arch/python-gpu-dev.sh`。
-- OpenMM 可用 `GRAL_SKIP_OPENMM=1` 跳过安装，或用 `GRAL_SKIP_OPENMM_TEST=1` 跳过官方安装测试。
+- 如果只想重跑验证、不重新装 GPU 包，可用 `GRAL_SKIP_GPU_PACKAGES=1 ./arch/python-gpu-dev.sh`。
 
 ## Local Whisper dictation：Ctrl+F 录音转文字到剪贴板
 
@@ -832,7 +814,7 @@ sudo pacman -Rns chromium
 - [ ] `zsh`、`tmux`、`nvim`、`lf` 可启动。
 - [ ] `~/.vimrc` 指向 shared `nvim/vimrc`。
 - [ ] Foot 使用 JetBrainsMono Nerd Font；颜色与 Nvim Gruvbox dark 一致；无透明背景。
-- [ ] Sway 自动打开 Foot/tmux + Chromium；`$mod+Tab` 在两个 app 间切换；没有 swaybar，背景纯黑无壁纸。
+- [ ] Sway 自动打开 Foot/tmux + Chromium；`$mod+Tab` 在两个 app 间切换；没有 swaybar，背景为 Gruvbox dark hard，无壁纸。
 - [ ] `$mod+Shift+t` 打开 Foot/tmux；`$mod+Shift+g` 打开 Chromium。
 - [ ] `$mod+h/j/k/l` focus；`$mod+Shift+h/j/k/l` move；`$mod+Shift+r` 恢复 1/9 默认布局。
 - [ ] 音量/静音/亮度快捷键可用，并通过 Mako 弹出临时通知。

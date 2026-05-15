@@ -1,3 +1,9 @@
+# Legacy 2023 manual notes. Current authoritative Arch flow is:
+#   1. arch/readme.md
+#   2. arch/install.sh
+#   3. arch/python-gpu-dev.sh only on NVIDIA/CUDA machines
+# Do not use this file as the current setup checklist.
+
 # 2023-06-16: boot stuck at /dev/... ...files, ...blocks
 #   in the boot menu, select fallback initramfs, boot and login successfully
 #   after that the normal boot and login works
