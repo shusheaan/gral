@@ -13,12 +13,24 @@ for cmd in uv ffmpeg pw-record wl-copy notify-send; do
 done
 
 mkdir -p "${venv_dir:h}"
-uv venv "$venv_dir"
+if [ ! -x "$python_bin" ]; then
+    venv_args=()
+    if [ "${WHISPER_SYSTEM_SITE:-0}" = "1" ]; then
+        venv_args+=(--system-site-packages)
+    fi
+    uv venv "${venv_args[@]}" "$venv_dir"
+fi
 
 # For NVIDIA/ROCm, install the matching torch wheel first if needed, then rerun this.
 # Example pattern after checking the official PyTorch selector:
 #   uv pip install --python "$python_bin" torch --index-url <pytorch-wheel-index>
-uv pip install --python "$python_bin" -U openai-whisper
+if ! "$python_bin" - <<'PY' >/dev/null 2>&1
+import torch
+import whisper
+PY
+then
+    uv pip install --python "$python_bin" -U openai-whisper
+fi
 
 "$python_bin" - <<PY
 import torch

@@ -1,7 +1,11 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-state_dir="${XDG_RUNTIME_DIR:-/tmp}/gral-whisper-dictation"
+if [ -n "${XDG_RUNTIME_DIR:-}" ]; then
+    state_dir="$XDG_RUNTIME_DIR/gral-whisper-dictation"
+else
+    state_dir="/tmp/gral-whisper-dictation-$UID"
+fi
 venv_dir="${WHISPER_VENV:-$HOME/.local/share/gral-whisper/.venv}"
 python_bin="$venv_dir/bin/python"
 pid_file="$state_dir/recording.pid"
@@ -24,6 +28,7 @@ fail() {
 
 start_recording() {
     mkdir -p "$state_dir"
+    chmod 700 "$state_dir"
     rm -f "$audio_file" "$text_file" "$log_file"
 
     command -v pw-record >/dev/null 2>&1 || fail "missing pw-record"

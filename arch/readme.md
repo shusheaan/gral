@@ -423,6 +423,55 @@ mako &
 
 环境变量由 `arch/environment.d/90-fcitx5.conf` 管理，并由 `~/.zprofile` 读取。输入法安装在大表内，Rime 明月拼音方案是 `rime-luna-pinyin`。
 
+## NVIDIA / CUDA / Python GPU dev baseline：RTX 5060 Ti 机器单独跑
+
+目标：GPU 相关包很大、强依赖硬件，不进入首轮 `arch/packages.txt`；确认这台机器有 NVIDIA GPU（例如 RTX 5060 Ti）后，单独跑：
+
+```sh
+cd ~/work/gral
+./arch/python-gpu-dev.sh
+```
+
+脚本做三层配置：
+
+- 系统层：通过 `pacman` 安装 `nvidia-open-dkms`、`nvidia-utils`、`opencl-nvidia`、`cuda`、`cudnn`、`nccl`，并按已安装 kernel 自动补 `linux-headers` / `linux-lts-headers`。
+- Arch Python 层：安装 `python-pytorch-cuda`、`python-openai-whisper`、`python-polars`、`pytest`/`hypothesis`、`mypy`、`ruff` 等机器级 Python 基础包。
+- 共享 venv 层：创建 `/opt/gral-python-gpu`，使用 `--system-site-packages` 读取 Arch 的 CUDA PyTorch，再用 `uv` 安装 `openmm[cuda13]`。如果 OpenMM 的 CUDA 13 wheel 有兼容问题，可改用：
+
+  ```sh
+  GRAL_OPENMM_CUDA_EXTRA=cuda12 ./arch/python-gpu-dev.sh
+  ```
+
+脚本还会写入：
+
+```text
+~/.config/environment.d/92-gral-python-gpu.conf
+```
+
+里面设置：
+
+```sh
+GRAL_PYTHON_GPU_VENV=/opt/gral-python-gpu
+WHISPER_VENV=/opt/gral-python-gpu
+```
+
+所以重新登录后，Sway 里的 `whisper-dictation-toggle` 会直接用共享 GPU Python，不再走每个用户目录里的 CPU fallback venv。
+
+常用验证：
+
+```sh
+nvidia-smi
+torch-test-gpu
+python-gpu -m openmm.testInstallation
+python-gpu -c 'import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))'
+```
+
+注意：
+
+- 如果脚本刚安装了 NVIDIA driver/DKMS，先 reboot 一次再判断 CUDA 是否正常；第一次运行时 `nvidia-smi` 失败通常只是 kernel module 还没加载。
+- 默认会预下载 `WHISPER_MODEL`（缺省 `large-v3`）。不想下载模型可用 `GRAL_SKIP_WHISPER_PREFETCH=1 ./arch/python-gpu-dev.sh`。
+- OpenMM 可用 `GRAL_SKIP_OPENMM=1` 跳过安装，或用 `GRAL_SKIP_OPENMM_TEST=1` 跳过官方安装测试。
+
 ## Local Whisper dictation：Ctrl+F 录音转文字到剪贴板
 
 目标：在 Sway 里用全局 `Ctrl+F` 做本地语音转文字。第一次按开始录音，`mako` 在屏幕中心靠上提示 `Recording... press Ctrl+F again to stop`；第二次按停止录音，`mako` 提示 `Recording stopped; transcribing locally...`，然后本地 Whisper 转写并自动写入 Wayland 全局剪贴板。
