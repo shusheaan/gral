@@ -1,0 +1,24 @@
+# Temporary packages for post-install hardware validation.
+# These are intentionally not part of arch/packages.txt baseline.
+# Parser contract:
+# - blank lines are ignored;
+# - lines whose first token starts with `#` are ignored;
+# - package lines install only the first whitespace-separated token.
+
+# --- System / board inventory ---
+dmidecode                    # SMBIOS/DMI：主板、BIOS、内存条 slot/part/serial。
+
+# --- CPU / RAM stress ---
+stress-ng                    # CPU/RAM/IO 压力测试。
+memtester                    # Linux 内存子系统测试；不能替代离线 MemTest86+。
+memtest86+-efi               # UEFI 离线内存测试；需要重启到 GRUB 菜单运行。
+
+# --- Storage health / stress ---
+smartmontools                # `smartctl`：SATA/NVMe SMART 健康、错误日志、自检。
+nvme-cli                     # `nvme smart-log`：NVMe 专用健康和错误统计。
+fio                          # 非破坏性文件级磁盘读写压力/校验。
+
+# --- GPU / graphics API ---
+mesa-utils                   # `glxinfo`/OpenGL 基本信息。
+vulkan-tools                 # `vulkaninfo`/Vulkan 基本信息。
+glmark2                      # OpenGL/Wayland GPU smoke/stress benchmark。

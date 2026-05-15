@@ -1,26 +1,34 @@
-# Arch first-reboot package list. One package per line; comments are ignored by arch/install.sh.
+# Arch first-reboot package list.
+# Parser contract for arch/install.sh:
+# - blank lines are ignored;
+# - lines whose first token starts with `#` are ignored;
+# - package lines install only the first whitespace-separated token.
+# Keep package names as the first token and put human notes after `#`.
+
+# --- Bootstrap / package access ---
 git                          # Git 版本控制；用于 clone gral 和日常开发。
-neovim                       # 终端编辑器 `nvim`。
 sudo                         # 让普通用户临时执行管理员命令。
+curl                         # HTTP 下载与 API 调试工具。
+wget                         # 简单文件下载工具。
+
+# --- Shell / terminal workflow ---
+neovim                       # 终端编辑器 `nvim`。
 zsh                          # 交互式 shell；Arch baseline 只用 bare zsh。
 zsh-completions              # 额外 zsh completion；不依赖 Oh My Zsh。
 zsh-autosuggestions          # 类 fish 的历史命令自动建议；不依赖 Oh My Zsh。
 zsh-syntax-highlighting      # 命令行语法高亮；不依赖 Oh My Zsh。
 tmux                         # 终端会话复用，断线/多窗口工作流。
 fzf                          # 命令行模糊搜索工具。
+just                         # 项目命令 runner。
+
+# --- Remote access / sync ---
 openssh                      # SSH 客户端/服务端，用于拉 Git repo 和远程登录。
 tailscale                    # WireGuard mesh VPN；手机 Termius 通过 tailnet SSH 回本机。
 rsync                        # 增量复制/备份文件。
 rclone                       # R2/S3/云存储检查与同步工具；给 Star storage 做独立验收。
-curl                         # HTTP 下载与 API 调试工具。
-wget                         # 简单文件下载工具。
-ffmpeg                       # Whisper 读取/转码音频必需；openai-whisper 调用它处理 wav/mp3 等输入。
+
+# --- Core system / storage / network ---
 dbus                         # 用户 session bus；Sway、通知、输入法都依赖它。
-base-devel                   # native build 基础开发工具组。
-clang                        # C/C++/libclang 工具链；Rust bindgen 与 native FFI 需要。
-cmake                        # 常见 native/Rust/Python 依赖的构建系统。
-gdb                          # C/Rust 原生程序调试器。
-just                         # 项目命令 runner。
 btrfs-progs                  # Btrfs 文件系统管理工具。
 snapper                      # Btrfs 快照管理。
 snap-pac                     # pacman 安装/升级前后自动创建 Snapper 快照。
@@ -28,6 +36,8 @@ grub-btrfs                   # 在 GRUB 中显示 Btrfs 快照启动菜单。
 inotify-tools                # 文件变化监听，供 grub-btrfsd 等工具使用。
 networkmanager               # 网络管理服务，负责 WiFi/有线网络连接。
 ufw                          # 简化版防火墙配置工具。
+
+# --- Bluetooth / audio ---
 bluez                        # Linux Bluetooth 协议栈。
 bluez-utils                  # `bluetoothctl` 等 Bluetooth 管理命令。
 pipewire                     # 现代音频/视频管线基础服务。
@@ -38,6 +48,9 @@ wireplumber                  # PipeWire 会话管理器。
 alsa-utils                   # `alsamixer`、`speaker-test` 等音频诊断工具。
 pavucontrol                  # GUI 音频路由/输入输出选择器；排查 Bluetooth mic/sink 时有用。
 pamixer                      # 命令行调节 PulseAudio/PipeWire 音量。
+ffmpeg                       # Whisper 读取/转码音频必需；openai-whisper 调用它处理 wav/mp3 等输入。
+
+# --- Wayland desktop ---
 sway                         # Wayland 窗口管理器。
 foot                         # Wayland 原生终端。
 chromium                     # 官方仓库 Chromium；统一走 pacman 更新，不使用 AUR 浏览器包。
@@ -49,9 +62,13 @@ wl-clipboard                 # Wayland 剪贴板命令行工具。
 brightnessctl                # 调节屏幕/键盘背光亮度。
 wlr-randr                    # Wayland 输出/显示器配置工具。
 wev                          # Wayland 输入事件查看器，用于查键盘鼠标事件。
+
+# --- Hardware diagnostics ---
 usbutils                     # `lsusb` 等 USB 设备诊断工具。
 pciutils                     # `lspci` 等 PCI 设备诊断工具。
 lm_sensors                   # `sensors`/`pwmconfig`/`fancontrol`；硬件支持时可控风扇。
+
+# --- Fonts / Chinese input ---
 ttf-jetbrains-mono-nerd      # 主字体：JetBrains Mono Nerd Font。
 noto-fonts-cjk               # 中文 fallback 字体。
 noto-fonts-emoji             # Emoji fallback 字体。
@@ -62,23 +79,33 @@ fcitx5-qt                    # Qt 应用中的 Fcitx5 输入支持。
 fcitx5-chinese-addons        # Fcitx5 中文输入法插件。
 fcitx5-rime                  # Fcitx5 的 Rime 输入法后端。
 rime-luna-pinyin             # Rime 明月拼音方案。
+
+# --- File manager / search / preview ---
 lf                           # 终端文件管理器。
-bat                          # 带语法高亮的 `cat` 替代品。
-eza                          # 现代 `ls` 替代品。
-fd                           # 现代 `find` 替代品。
-ripgrep                      # 快速全文搜索 `rg`。
+bat                          # 带语法高亮的 `cat` 替代品；供 lf/yazi preview 使用。
+eza                          # 现代 `ls` 替代品；供 lf/yazi 目录 preview 使用。
+fd                           # 现代 `find` 替代品；供 picker/fzf/yazi 目录跳转使用。
+ripgrep                      # 快速全文搜索 `rg`；供 Nvim/lf/yazi 搜索使用。
 jq                           # JSON 命令行处理工具。
 poppler                      # PDF/文档预览工具集；供 lf preview 使用。
 unzip                        # 解压 `.zip` 文件。
 7zip                         # 官方 7-Zip CLI。
 unrar                        # 解压 `.rar` 文件。
 highlight                    # 代码高亮工具，供预览脚本使用。
+
+# --- Native / language toolchains ---
+base-devel                   # native build 基础开发工具组。
+clang                        # C/C++/libclang 工具链；Rust bindgen 与 native FFI 需要。
+cmake                        # 常见 native/Rust/Python 依赖的构建系统。
+gdb                          # C/Rust 原生程序调试器。
 python                       # Python 运行时。
 python-pip                   # Python 包安装工具；只作兜底。
 uv                           # 唯一默认 Python env/package/tool 管理器。
 rustup                       # Rust toolchain 管理器。
 nodejs                       # Node.js 运行时。
 npm                          # Node.js 包管理器。
+
+# --- Editors / LSP / format / test tools ---
 stylua                       # Lua formatter；Nvim 配置保存时使用。
 taplo-cli                    # TOML formatter/LSP CLI；Cargo.toml 与配置文件格式化。
 yamlfmt                      # YAML formatter；Nvim YAML format-on-save 使用。
