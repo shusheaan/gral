@@ -279,37 +279,62 @@ cpu_usage_percent() {
     return 1
 }
 
-formatted_cpu_usage() {
-    cpu="$(cpu_usage_percent | sed -nE '/^[0-9]+([.][0-9]+)?$/p' | head -n 1)"
+STATUS_NORMAL_COLOR="#ebdbb2"
+STATUS_WARNING_COLOR="#d8a657"
 
-    if [ -z "$cpu" ]; then
-        printf -- '--%%'
-        return 0
-    fi
-
-    awk -v cpu="$cpu" '
-        BEGIN {
-            if (cpu < 0) {
-                cpu = 0
-            }
-            if (cpu > 100) {
-                cpu = 100
-            }
-
-            printf "%02.0f%%", cpu
-        }
-    '
+is_number() {
+    [ -n "$1" ] || return 1
+    awk -v value="$1" 'BEGIN { exit !(value ~ /^[0-9]+([.][0-9]+)?$/) }'
 }
 
-formatted_temperature() {
-    temp="$(temperature_celsius | sed -nE '/^[0-9]+([.][0-9]+)?$/p' | head -n 1)"
+formatted_status_pair() {
+    usage="$1"
+    temp="$2"
 
-    if [ -z "$temp" ]; then
-        printf -- '--°'
-        return 0
+    usage_text="--%"
+    temp_text="--°"
+
+    if is_number "$usage"; then
+        usage_text="$(awk -v usage="$usage" '
+            BEGIN {
+                if (usage < 0) {
+                    usage = 0
+                }
+                if (usage > 100) {
+                    usage = 100
+                }
+                printf "%02.0f%%", usage
+            }
+        ')"
     fi
 
-    awk -v temp="$temp" 'BEGIN { printf "%.0f°", temp }'
+    if is_number "$temp" && is_valid_temperature "$temp"; then
+        temp_text="$(awk -v temp="$temp" 'BEGIN { printf "%.0f°", temp }')"
+    fi
+
+    color="$STATUS_NORMAL_COLOR"
+    if awk -v usage="$usage" -v temp="$temp" '
+        BEGIN {
+            warn = 0
+            if (usage ~ /^[0-9]+([.][0-9]+)?$/ && usage > 90) {
+                warn = 1
+            }
+            if (temp ~ /^[0-9]+([.][0-9]+)?$/ && temp > 60) {
+                warn = 1
+            }
+            exit !warn
+        }
+    '; then
+        color="$STATUS_WARNING_COLOR"
+    fi
+
+    printf '#[fg=%s,bold]%s/%s#[fg=%s,bold]' "$color" "$usage_text" "$temp_text" "$STATUS_NORMAL_COLOR"
+}
+
+formatted_cpu_status() {
+    usage="$(cpu_usage_percent | sed -nE '/^[0-9]+([.][0-9]+)?$/p' | head -n 1)"
+    temp="$(temperature_celsius | sed -nE '/^[0-9]+([.][0-9]+)?$/p' | head -n 1)"
+    formatted_status_pair "$usage" "$temp"
 }
 
 battery_from_pmset() {
@@ -325,8 +350,10 @@ formatted_battery() {
         return 0
     fi
 
-    pct="$(printf '%s\n' "$line" | sed -nE 's/.*[[:space:]]([0-9]+)%;.*/\1/p')"
-    state="$(printf '%s\n' "$line" | sed -nE 's/.*%;[[:space:]]*([^;]+);.*/\1/p')"
+    pct="$(printf '%s
+' "$line" | sed -nE 's/.*[[:space:]]([0-9]+)%;.*/\1/p')"
+    state="$(printf '%s
+' "$line" | sed -nE 's/.*%;[[:space:]]*([^;]+);.*/\1/p')"
 
     if [ -z "$pct" ]; then
         printf -- '--%%'
@@ -343,4 +370,4 @@ formatted_battery() {
     esac
 }
 
-printf ' %s  %s  %s ' "$(formatted_cpu_usage)" "$(formatted_temperature)" "$(formatted_battery)"
+printf ' %s  #[bold]%s#[bold] ' "$(formatted_cpu_status)" "$(formatted_battery)"

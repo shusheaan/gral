@@ -230,7 +230,6 @@ return {
               color = { fg = "#ebdbb2", gui = "bold" },
             },
             { function() return vim.lsp.status() end, color = { fg = "#fabd2f" } },
-            { "filetype", icon_only = true },
           },
           lualine_y = { "progress" },
           lualine_z = { "location" },

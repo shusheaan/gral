@@ -1,8 +1,6 @@
 #!/usr/bin/zsh
 GRAL=$(pwd)
 
-ln -sf $GRAL/zshrc $HOME/.zshrc
-
 mkdir -p $HOME/.config/nvim
 ln -sf $GRAL/nvim/vimrc $HOME/.vimrc
 

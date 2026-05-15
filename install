@@ -20,11 +20,6 @@ link_managed_path() {
     ln -sfn "$source" "$target"
 }
 
-ln -sf $GRAL/zshrc $HOME/.zshrc
-ln -sf $GRAL/xinitrc $HOME/.xinitrc
-ln -sf $GRAL/xmodmap.sh $HOME/.xmodmap.sh
-ln -sf $GRAL/xmodmap.conf $HOME/.xmodmap.conf
-
 # Vim (minimal fallback)
 ln -sf $GRAL/nvim/vimrc $HOME/.vimrc
 
@@ -46,11 +41,6 @@ ln -sf $GRAL/yazi/theme.toml $HOME/.config/yazi/theme.toml
 mkdir -p $HOME/.config/lf
 ln -sf $GRAL/lf/lfrc $HOME/.config/lf/lfrc
 ln -sf $GRAL/lf/preview.sh $HOME/.config/lf/preview.sh
-
-mkdir -p $HOME/.config/i3
-ln -sf $GRAL/i3.conf $HOME/.config/i3/config
-
-
 
 mkdir -p $HOME/.config/alacritty
 ln -sf $GRAL/alacritty.yml $HOME/.config/alacritty/alacritty.yml

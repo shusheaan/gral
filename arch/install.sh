@@ -39,7 +39,7 @@ if [ "$(uname -s)" != "Linux" ]; then
 fi
 
 if [ "$(id -u)" -eq 0 ]; then
-    echo "Run arch/install.sh as your normal user, not root. It uses sudo for pacman, and AUR/makepkg refuses root."
+    echo "Run arch/install.sh as your normal user, not root. It uses sudo for pacman and links user dotfiles."
     exit 1
 fi
 
@@ -72,43 +72,6 @@ install_packages() {
     sudo pacman -Syu --needed "${packages[@]}"
 }
 
-install_google_chrome() {
-    local aur_root="${XDG_CACHE_HOME:-$HOME/.cache}/gral-aur"
-    local package_dir="$aur_root/google-chrome"
-
-    if [ "${GRAL_SKIP_AUR:-0}" = "1" ] || [ "${GRAL_SKIP_CHROME:-0}" = "1" ]; then
-        echo "Skipping Google Chrome AUR install because GRAL_SKIP_AUR=1 or GRAL_SKIP_CHROME=1."
-        return
-    fi
-
-    if command -v google-chrome-stable >/dev/null 2>&1; then
-        echo "Google Chrome already installed: $(command -v google-chrome-stable)"
-        return
-    fi
-
-    for cmd in git makepkg sudo; do
-        if ! command -v "$cmd" >/dev/null 2>&1; then
-            echo "Cannot install Google Chrome; missing command: $cmd" >&2
-            return 1
-        fi
-    done
-
-    mkdir -p "$aur_root" || return 1
-    if [ -d "$package_dir/.git" ]; then
-        git -C "$package_dir" pull --ff-only || return 1
-    elif [ -e "$package_dir" ]; then
-        echo "AUR path exists but is not a git checkout: $package_dir" >&2
-        echo "Move it away manually, then rerun ./arch/install.sh." >&2
-        return 1
-    else
-        git clone https://aur.archlinux.org/google-chrome.git "$package_dir" || return 1
-    fi
-
-    (
-        cd "$package_dir"
-        makepkg -si --noconfirm
-    ) || return 1
-}
 
 install_system_policy() {
     local logind_conf="$ARCH/systemd/logind.conf.d/10-gral-session.conf"
@@ -123,6 +86,7 @@ install_system_policy() {
 enable_system_services() {
     if command -v systemctl >/dev/null 2>&1; then
         sudo systemctl enable --now NetworkManager.service || true
+        sudo systemctl enable --now bluetooth.service || true
         sudo systemctl enable --now sshd.service || true
         sudo systemctl enable --now tailscaled.service || true
     fi
@@ -148,6 +112,8 @@ fi
 link_managed_path "$ARCH/zshrc" "$HOME/.zshrc"
 link_managed_path "$ARCH/tmux.conf" "$HOME/.tmux.conf"
 link_managed_path "$ARCH/tmux-system-status.sh" "$HOME/.local/bin/tmux-system-status.sh"
+link_managed_path "$ARCH/bin/sway-workbench-layout" "$HOME/.local/bin/sway-workbench-layout"
+link_managed_path "$ARCH/bin/audio-output" "$HOME/.local/bin/audio-output"
 link_managed_path "$ARCH/bin/whisper-dictation-setup" "$HOME/.local/bin/whisper-dictation-setup"
 link_managed_path "$ARCH/bin/whisper-dictation-toggle" "$HOME/.local/bin/whisper-dictation-toggle"
 
@@ -169,6 +135,7 @@ link_managed_path "$GRAL/lf/pv.sh" "$HOME/.config/lf/pv.sh"
 link_managed_path "$ARCH/sway/config" "$HOME/.config/sway/config"
 link_managed_path "$ARCH/foot/foot.ini" "$HOME/.config/foot/foot.ini"
 link_managed_path "$ARCH/mako/config" "$HOME/.config/mako/config"
+sudo install -Dm644 "$ARCH/chromium/policies/managed/10-gral-extensions.json" /etc/chromium/policies/managed/10-gral-extensions.json
 for env_file in "$ARCH"/environment.d/*.conf(N); do
     link_managed_path "$env_file" "$HOME/.config/environment.d/${env_file:t}"
 done
@@ -205,22 +172,14 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service || true
 fi
 
-if [ "${GRAL_SKIP_AUR:-0}" = "1" ] || [ "${GRAL_SKIP_CHROME:-0}" = "1" ]; then
-    chrome_status="skipped"
-else
-    chrome_status="ready"
-    if ! install_google_chrome; then
-        chrome_status="failed; rerun: cd ~/.cache/gral-aur/google-chrome && makepkg -si"
-    fi
-fi
 
 cat <<MSG
 Installed Arch package list and linked dotfiles from ./arch.
-Google Chrome AUR status: $chrome_status
+Chromium baseline: official pacman package plus managed extension policy.
 Next:
   1. Log out of this TTY, then log back in once so ~/.zprofile and the zsh login shell are clean.
   2. Start GUI manually when needed: sway
-  3. Sway should auto-start Foot/tmux and Google Chrome.
+  3. Sway should auto-start Foot/tmux and Chromium.
   4. Mod+Shift+Q exits Sway back to the TTY login prompt; tmux sessions stay detached.
   5. SSH is enabled; attach from another device with: tmux attach -t work
   6. Tailscale daemon is enabled; authenticate once with: sudo tailscale up --operator="$USER" --qr

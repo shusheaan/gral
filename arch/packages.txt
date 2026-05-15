@@ -1,5 +1,5 @@
 # Arch first-reboot package list. One package per line; comments are ignored by arch/install.sh.
-git                          # Git 版本控制；也是从 AUR 构建包的基础工具。
+git                          # Git 版本控制；用于 clone gral 和日常开发。
 neovim                       # 终端编辑器 `nvim`。
 sudo                         # 让普通用户临时执行管理员命令。
 zsh                          # 交互式 shell；Arch baseline 只用 bare zsh。
@@ -16,7 +16,7 @@ curl                         # HTTP 下载与 API 调试工具。
 wget                         # 简单文件下载工具。
 ffmpeg                       # Whisper 读取/转码音频必需；openai-whisper 调用它处理 wav/mp3 等输入。
 dbus                         # 用户 session bus；Sway、通知、输入法都依赖它。
-base-devel                   # AUR/native build 基础开发工具组。
+base-devel                   # native build 基础开发工具组。
 clang                        # C/C++/libclang 工具链；Rust bindgen 与 native FFI 需要。
 cmake                        # 常见 native/Rust/Python 依赖的构建系统。
 gdb                          # C/Rust 原生程序调试器。
@@ -32,6 +32,7 @@ bluez                        # Linux Bluetooth 协议栈。
 bluez-utils                  # `bluetoothctl` 等 Bluetooth 管理命令。
 pipewire                     # 现代音频/视频管线基础服务。
 pipewire-pulse               # PulseAudio 兼容层，让旧应用走 PipeWire。
+libpulse                     # 提供 `pactl`，用于 terminal 快速切换音频输出。
 pipewire-alsa                # ALSA 兼容层。
 wireplumber                  # PipeWire 会话管理器。
 alsa-utils                   # `alsamixer`、`speaker-test` 等音频诊断工具。
@@ -39,6 +40,7 @@ pavucontrol                  # GUI 音频路由/输入输出选择器；排查 B
 pamixer                      # 命令行调节 PulseAudio/PipeWire 音量。
 sway                         # Wayland 窗口管理器。
 foot                         # Wayland 原生终端。
+chromium                     # 官方仓库 Chromium；统一走 pacman 更新，不使用 AUR 浏览器包。
 mako                         # Wayland 通知 daemon。
 libnotify                    # 提供 `notify-send`，用于音量/亮度等临时通知。
 grim                         # Wayland 截图工具。

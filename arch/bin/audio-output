@@ -1,0 +1,123 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  audio-output list
+  audio-output current
+  audio-output usb
+  audio-output bt
+  audio-output toggle
+  audio-output match <regex>
+
+Uses PipeWire's PulseAudio-compatible control path (`pactl`). It sets the
+new default sink and moves currently playing streams to that sink.
+EOF
+}
+
+require_pactl() {
+  if ! command -v pactl >/dev/null 2>&1; then
+    echo 'missing pactl; install the libpulse package and rerun ./arch/install.sh' >&2
+    exit 127
+  fi
+}
+
+list_sinks() {
+  require_pactl
+  echo "default: $(pactl get-default-sink 2>/dev/null || true)"
+  pactl list short sinks
+}
+
+current_sink() {
+  require_pactl
+  pactl get-default-sink
+}
+
+find_sink() {
+  local pattern="$1"
+  pactl list short sinks | awk -v pat="${pattern:l}" '
+    BEGIN { found = 0 }
+    {
+      line = tolower($0)
+      name = tolower($2)
+      if (name ~ pat || line ~ pat) {
+        print $2
+        found = 1
+        exit
+      }
+    }
+    END { if (!found) exit 1 }
+  '
+}
+
+move_active_streams() {
+  local sink="$1"
+  local input_id
+  pactl list short sink-inputs | awk '{ print $1 }' | while read -r input_id; do
+    [ -n "$input_id" ] || continue
+    pactl move-sink-input "$input_id" "$sink" >/dev/null 2>&1 || true
+  done
+}
+
+set_sink() {
+  local sink="$1"
+  pactl set-default-sink "$sink"
+  move_active_streams "$sink"
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -a audio -r 1004 'Audio output' "$sink" >/dev/null 2>&1 || true
+  fi
+  echo "$sink"
+}
+
+select_by_pattern() {
+  local pattern="$1"
+  local sink
+  sink="$(find_sink "$pattern")" || {
+    echo "No audio sink matched regex: $pattern" >&2
+    echo 'Available sinks:' >&2
+    pactl list short sinks >&2
+    exit 1
+  }
+  set_sink "$sink"
+}
+
+require_pactl
+case "${1:-}" in
+  list)
+    list_sinks
+    ;;
+  current)
+    current_sink
+    ;;
+  usb)
+    select_by_pattern 'usb|alsa_output\.usb|headphone|headset|dac|stax|electro'
+    ;;
+  bt|bluetooth)
+    select_by_pattern 'bluez|bluetooth|a2dp|speaker'
+    ;;
+  toggle)
+    current="$(current_sink 2>/dev/null || true)"
+    if [[ "${current:l}" =~ 'bluez|bluetooth|a2dp' ]]; then
+      select_by_pattern 'usb|alsa_output\.usb|headphone|headset|dac|stax|electro'
+    else
+      select_by_pattern 'bluez|bluetooth|a2dp|speaker'
+    fi
+    ;;
+  match)
+    if [ -z "${2:-}" ]; then
+      echo 'audio-output match requires a regex pattern.' >&2
+      usage >&2
+      exit 2
+    fi
+    select_by_pattern "$2"
+    ;;
+  -h|--help|help|'')
+    usage
+    ;;
+  *)
+    echo "Unknown audio-output command: $1" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

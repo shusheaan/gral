@@ -1,0 +1,16 @@
+{
+  "ExtensionSettings": {
+    "dbepggeogbaibhgnhhndojpepiihcmeb": {
+      "installation_mode": "force_installed",
+      "update_url": "https://clients2.google.com/service/update2/crx"
+    },
+    "eimadpbcbfnmbkopoojfekhnkhdbieeh": {
+      "installation_mode": "force_installed",
+      "update_url": "https://clients2.google.com/service/update2/crx"
+    },
+    "bombmeelannelmofjhiopdoedljnpech": {
+      "installation_mode": "force_installed",
+      "update_url": "https://clients2.google.com/service/update2/crx"
+    }
+  }
+}

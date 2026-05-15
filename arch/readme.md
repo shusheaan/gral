@@ -1,42 +1,71 @@
 # Arch Linux setup for gral
 
-目标：Arch 首轮只做一个稳定、可回滚、低 bloat 的工作环境：TTY 登录，手动 `sway` 进入 GUI；GUI 只服务两个主 app：`foot`/`tmux` 和 Chrome。状态常驻在 `tmux`，桌面层只负责窗口、输入法、音频/亮度通知。
+目标：Arch 首轮只做一个稳定、可回滚、低 bloat 的工作环境：TTY 登录，手动 `sway` 进入 GUI；GUI 只服务两个主 app：`foot`/`tmux` 和 Chromium。状态常驻在 `tmux`，桌面层只负责窗口、输入法、音频/亮度通知。
 
 ## 当前原则
 
 - 不装 Display Manager；登录后默认还是 shell，需要 GUI 时手动运行 `sway`。
 - Arch 图形层只保留 Sway + Foot + Mako + Fcitx5；历史 X11 WM/bar/terminal/editor-extension 配置不进入 Arch flow。
-- `Mod`/Super 是桌面级快捷键；`Ctrl` 留给 `tmux`、Nvim、Chrome/Citrix 内容区。
+- `Mod`/Super 是桌面级快捷键；`Ctrl` 留给 `tmux`、Nvim、Chromium/Citrix 内容区。
 - `mac/` 是当前 Mac 快照；Arch 修改只放在 `arch/`，共享项只使用 repo root 的 `nvim/`、`lf/`、`claude/`、`codex/`。
-- Citrix native 依赖单独安装；如果 Chrome 网页版能解决快捷键/音频，就不装 native client。
+- Citrix native 依赖单独安装；如果 Chromium 网页版能解决快捷键/音频，就不装 native client。
+
+## 速度 / 低延迟目标：神经级反应优先
+
+目标：本机交互优先“按下去立刻有反应”，不要为了完整桌面体验牺牲 latency。默认策略是少组件、少动画、少后台服务、热路径常驻。
+
+已落实在配置里：
+
+- 不装 Display Manager：开机只到 TTY，手动 `sway`，少一层 GUI login stack。
+- `arch/zshrc` 用 `exec /usr/bin/sway` 启动 GUI：退出 Sway 后直接回 TTY login prompt，不留下已解锁 shell。
+- Sway 单 workspace、无 bar block、无 swaybar、无壁纸、纯黑背景、无桌面特效；状态放在 `tmux`，不让桌面层持续刷新。
+- Foot 是唯一 terminal，直接进入 `tmux new-session -A -s work`。
+- Chromium 是默认浏览器，走官方 pacman 包，不走 AUR；启动参数强制 Wayland 和 dark UI：`chromium --ozone-platform=wayland --force-dark-mode --enable-features=WebUIDarkMode`。
+- Keyboard repeat 已按激进交互调优：`repeat_delay 120`、`repeat_rate 80`。如果误触太多，再退回 `150/60`。
+- `Mod+Tab` 切 Foot/Chromium，`Mod+Shift+R` 一键恢复 1/9 默认布局，避免手工摆窗浪费时间。
+- SSH 走常驻 `sshd.service`，不用 socket activation；远程连接第一下不等 systemd 临时拉起 daemon。
+
+装完后优先检查显示器最高刷新率。不要在 `sway/config` 里硬编码未知显示器；第一次进 Sway 后先看真实输出名和可用 mode：
+
+```sh
+swaymsg -t get_outputs
+wlr-randr
+```
+
+如果看到高刷新 mode，比如 `2560x1440@144Hz` / `1920x1080@165Hz`，再按实际输出名写入 `arch/sway/config`，例如：
+
+```sway
+# Example only; replace DP-1 and mode with `swaymsg -t get_outputs` output.
+output DP-1 mode 2560x1440@144Hz
+```
+
+不建议首轮就做 kernel/sysctl/scheduler “玄学优化”：它们容易降低稳定性，而且对你的实际工作流收益通常小于高刷新率、少组件、Foot/tmux、Wayland-native Chromium。
 
 ## 目录布局
 
 - `install.sh`：第一次重启后安装 `arch/packages.txt`，再 link Arch 配置。
 - `packages.txt`：首轮 pacman 包清单；避免在 `archinstall` 里手打长 list。
-- `sway/config`：单工作区 Foot + Chrome 配置；包含方向键/移动/resize、Gruvbox border、隐藏 bar、音量/亮度通知。
+- `sway/config`：单工作区 Foot + Chromium 配置；启动后调用 `bin/sway-workbench-layout` 按真实显示器尺寸摆放 floating 窗口，包含方向键/移动/resize、Gruvbox border、纯黑背景、无 swaybar、音量/亮度通知。
 - `foot/foot.ini`：Foot 终端配置；Gruvbox dark medium，与 `nvim/lua/plugins/colorscheme.lua` 保持一致。
 - `mako/config`：通知样式。
 - `environment.d/90-fcitx5.conf`：输入法环境变量。
 - `environment.d/91-whisper.conf`：本地 Whisper dictation 默认模型/任务配置。
-- `zshrc`、`tmux.conf`、`tmux-system-status.sh`：Arch terminal baseline。
+- `zshrc`、`tmux.conf`、`tmux-system-status.sh`、`bin/sway-workbench-layout`、`bin/audio-output`：Arch terminal / Sway workbench baseline。
 - `ssh/config`：Arch outbound SSH client config，默认包含 GitHub，RunPod 留 template。
 - `systemd/logind.conf.d/10-gral-session.conf`：本地退出后保留 tmux、禁止自动 sleep 的 session policy。
 - repo root 共享：`nvim/`（含 `nvim/vimrc`）、`lf/`、`claude/`、`codex/`。
 
 ## 光速安装策略：不要在 archinstall 里手打大表
 
-推荐做法：`archinstall` 里只填最小 bootstrap，第一次登录后让 `./arch/install.sh` 从 `arch/packages.txt` 一次性安装完整包清单。
-
-`archinstall` 的 Additional packages 只需要：
+推荐做法：`archinstall` 里只填最小 bootstrap，第一次登录后让 `./arch/install.sh` 从 `arch/packages.txt` 一次性安装完整包清单。`archinstall` 的 Additional packages 只需要：
 
 ```text
 git sudo zsh neovim networkmanager openssh curl
 ```
 
-如果你在 `archinstall` 的 Network 选项里已经选了 NetworkManager，`networkmanager` 也可以不重复填。关键是第一轮要有 `git`、`sudo`、`zsh`，这样重启后能 clone repo 并直接跑 `./arch/install.sh`。
+如果你在 `archinstall` 的 Network 选项里已经选了 NetworkManager，`networkmanager` 也可以不重复填。关键是第一轮要有 `git`、`sudo`、`zsh`；`openssh` / `curl` 是为了 SSH copy-paste 和临时下载/诊断更顺手。
 
-裸机 TTY 如果不方便粘贴，也可以在 Arch ISO 里先开 SSH，从 Mac 终端连进去运行 `archinstall`，这样粘贴长文本会很顺：
+裸机 TTY 如果不方便粘贴，也可以在 Arch ISO 里先开 SSH，从 Mac 终端连进去运行 `archinstall`：
 
 ```sh
 # Arch ISO live TTY
@@ -54,7 +83,7 @@ archinstall
 - Mirrors：United States / Canada / Worldwide，按测速结果选。
 - Locale：`en_US.UTF-8`；之后可加 `zh_CN.UTF-8 UTF-8`。
 - Disk：确认目标盘无误；使用 `btrfs` + LUKS 全盘加密。
-  - 为什么要 LUKS：防止别人拿到机器/硬盘后直接读 `~/.ssh`、Chrome profile、repo、token/cache。
+  - 为什么要 LUKS：防止别人拿到机器/硬盘后直接读 `~/.ssh`、Chromium profile、repo、token/cache。
   - 代价：断电或 reboot 后，远程 SSH/Tailscale 不会自动回来，必须本地输入 LUKS 密码完成开机解锁。这个 tradeoff 接受；机器正常开着时仍然 always-on。
 - Snapshots：如果 installer 菜单提供，启用 Snapper。
 - Bootloader：`GRUB`，方便配合 `grub-btrfs` 从快照启动。
@@ -63,7 +92,7 @@ archinstall
 - Profile：Minimal / No profile。
 - Audio：PipeWire。
 - Network：NetworkManager。
-- User：创建普通用户，并给 sudo/wheel 权限。`./arch/install.sh` 要用普通用户运行，不要 `sudo ./arch/install.sh`；脚本内部会自己 `sudo pacman`，而 AUR `makepkg` 不能用 root 跑。
+- User：创建普通用户，并给 sudo/wheel 权限。`./arch/install.sh` 要用普通用户运行，不要 `sudo ./arch/install.sh`；脚本内部会自己 `sudo pacman`。
 
 ## Packages list：一个带中文 comment 的唯一清单
 
@@ -99,41 +128,35 @@ exit
 `arch/install.sh` 会：
 
 - 先执行 `sudo pacman -Syu --needed` 安装 `arch/packages.txt` 中的完整包清单；如果只想重 link 配置，可运行 `GRAL_SKIP_PACKAGES=1 ./arch/install.sh`。
-- 从 AUR 构建安装 `google-chrome`；如果只想跳过 Chrome，可运行 `GRAL_SKIP_CHROME=1 ./arch/install.sh`。
+- 默认使用官方仓库 `chromium`，并安装 Chromium managed policy 自动装 Vimium / Dark Reader / Slowed + Reverb；不安装、不构建、不引用 AUR 浏览器包。
 - link `arch/zshrc`、`arch/tmux.conf`、`arch/tmux-system-status.sh`。
 - link `arch/ssh/config` 到 `~/.ssh/config`。
 - link shared `nvim/`、`nvim/vimrc`、`lf/`。
-- link `arch/sway/config`、`arch/foot/foot.ini`、`arch/mako/config`、`arch/environment.d/*.conf`。
+- link `arch/sway/config`、`arch/foot/foot.ini`、`arch/mako/config`、`arch/environment.d/*.conf`、`arch/bin/audio-output`，并安装 `/etc/chromium/policies/managed/10-gral-extensions.json`。
 - best-effort 设置 login shell 为 zsh。
-- 调用 root `./sync-ai`，让 Mac/Arch 共用 `claude/` 与 `codex/`。
+- 调用 repo root 的 `./sync-ai`，让 Mac/Arch 共用 `claude/` 与 `codex/`。
 - 初始化 Rust stable + `rust-analyzer`/`rust-src`。
 - 尝试启用 PipeWire user services。
+- 启用 `bluetooth.service`，让 Bluetooth 音响/耳机可以直接配对连接。
 - 启用 `sshd.service`，方便手机/其他机器 SSH 回来 attach tmux。
 - 启用 `tailscaled.service`；第一次还需要你手动 `sudo tailscale up --operator="$USER" --qr` 登录 tailnet。
 - 安装 `/etc/systemd/logind.conf.d/10-gral-session.conf`：本地 logout 后不杀用户进程，并忽略自动 idle/lid sleep。
 
-`install.sh` 不会强制把你踢出当前 TTY。完成后你手动 logout/login 一次：
-
-```sh
-exit
-```
-
-重新登录后，之后需要 GUI 时手动运行：
+`install.sh` 不会强制把你踢出当前 TTY。完成后你手动 logout/login 一次。重新登录后，之后需要 GUI 时手动运行：
 
 ```sh
 sway
 ```
 
-预期结果：`install.sh` 结束后，`foot`、`tmux`、`google-chrome-stable` 都应该已经可用；第一次进入 Sway 会自动打开 Foot/tmux 和 Chrome。
+预期结果：第一次进入 Sway 会自动打开 Foot/tmux 和 Chromium，并按 1/9 对角错位布局摆好。
 
 ## 本地退出 / 远程继续跑任务
 
 目标行为：
 
 - 开机后只到 TTY login prompt。
-- 你输入密码登录，需要 GUI 时才手动 `sway`。
-- `sway` 启动后自动打开 Foot/tmux 和 Chrome，并按 `arch/sway/config` 摆好位置。
-- `Mod+Shift+Q` 退出整个 Sway session：Foot 和 Chrome 关闭，回到 TTY login prompt。
+- `sway` 启动后自动打开 Foot/tmux 和 Chromium，并调用 `sway-workbench-layout` 按真实显示器尺寸摆好 floating 位置。
+- `Mod+Shift+Q` 退出整个 Sway session：Foot 和 Chromium 关闭，回到 TTY login prompt。
 - tmux server/session 保留；后台任务继续跑。
 - 手机或其他机器可以 SSH 回来；`arch/zshrc` 会自动 attach `work` tmux session，如果没有自动 attach，就手动：
 
@@ -173,7 +196,7 @@ swaymsg exit
 效果和本地按 `Mod+Shift+Q` 一样：
 
 - 本地 Sway/compositor 退出。
-- Chrome 和 Foot 关闭。
+- Chromium 和 Foot 关闭。
 - 本地屏幕回到 TTY login prompt。
 - 当前手机 SSH 连接和 tmux session 继续存在。
 - tmux 后台任务继续跑。
@@ -278,34 +301,79 @@ ssh <user>@<tailscale-ip>
 tmux attach -t work
 ```
 
-确认 key login OK 后，再考虑把 SSH password login 关掉：
+### 推荐 sshd 安全方案：OpenSSH over Tailscale，只允许 public key
+
+推荐方案不是 Tailscale SSH，而是标准 OpenSSH 跑在 Tailscale 网络上：
+
+- 认证面：只允许 public key；禁用 password / keyboard-interactive；禁 root。
+- 网络面：UFW 只允许 `tailscale0` 进 22；普通 LAN/WiFi 不暴露 SSH。
+- 速度面：保留常驻 `sshd.service`，不用 socket activation；关闭 DNS/GSSAPI 等不必要登录路径。
+- 可恢复性：改 sshd 前必须已经有本地 TTY 或一个仍打开的 SSH session；先 `sshd -t` 再 reload。
+
+如果曾经启用过 Tailscale SSH，先关掉，避免多一套 SSH 入口：
+
+```sh
+sudo tailscale set --ssh=false
+```
+
+写入 OpenSSH hardening drop-in：
 
 ```sh
 sudo install -d -m 755 /etc/ssh/sshd_config.d
-sudo tee /etc/ssh/sshd_config.d/20-gral-hardening.conf >/dev/null <<'EOF'
+sudo tee /etc/ssh/sshd_config.d/20-gral-tailscale-pubkey.conf >/dev/null <<EOF
+# gral: fast and locked-down OpenSSH for Termius/Tailscale.
+PubkeyAuthentication yes
+AuthenticationMethods publickey
 PasswordAuthentication no
 KbdInteractiveAuthentication no
 PermitRootLogin no
-PubkeyAuthentication yes
+AllowUsers $USER
+
+# Interactive shell only; no SSH forwarding surface by default.
+DisableForwarding yes
+PermitTTY yes
+PermitUserEnvironment no
+X11Forwarding no
+
+# Lower login latency and reduce brute-force window.
+UseDNS no
+GSSAPIAuthentication no
+LoginGraceTime 20
+MaxAuthTries 3
+MaxSessions 2
+ClientAliveInterval 300
+ClientAliveCountMax 2
+LogLevel VERBOSE
 EOF
+
+sudo sshd -t
 sudo systemctl reload sshd
 ```
+
+验证必须使用 key，且不要关闭当前救援 shell，直到新连接成功：
+
+```sh
+TAILSCALE_IP="$(tailscale ip -4 | head -n 1)"
+ssh -o PreferredAuthentications=publickey -o PasswordAuthentication=no "$USER@$TAILSCALE_IP"
+```
+
+Termius 里为了最快首包，可以直接填 `tailscale ip -4` 的 `100.x.y.z`；MagicDNS 更好记，但多一次 DNS 路径。
 
 ### 只允许 Tailscale 上的 SSH
 
 原则：SSH 最终只应该从 `tailscale0` 进来，不要长期暴露在普通 LAN/WiFi 上。先确保 Termius 通过 Tailscale 已经能登录，再收紧防火墙；不要反过来做，避免把自己锁在外面。
 
-等 Termius 通过 Tailscale 能连进去以后，再开 UFW 限制 SSH 只从 `tailscale0` 进来：
+等 Termius 通过 Tailscale key login 能连进去以后，再开 UFW 限制 SSH 只从 `tailscale0` 进来：
 
 ```sh
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow in on tailscale0 to any port 22 proto tcp
+sudo ufw limit in on tailscale0 to any port 22 proto tcp comment 'ssh over tailscale only'
 sudo ufw enable
 sudo ufw status verbose
 ```
 
-不要在 Tailscale 还没连通前开这组规则，避免把自己从 LAN SSH 里锁出去。
+不要在 Tailscale 还没连通前开这组规则，避免把自己从 LAN SSH 里锁出去。也不建议默认用 `ListenAddress 100.x.y.z` 绑定 sshd：如果 `sshd.service` 启动时 Tailscale IP 还没起来，sshd 可能启动失败。用 UFW 限制 `tailscale0` 更稳。
 
 确认 UFW 生效后，普通 LAN IP 不应该能 SSH，Tailscale IP 应该能 SSH：
 
@@ -370,9 +438,133 @@ ssh runpod-main
 
 手机 Termius 连接 RunPod 也是同一个逻辑：Host 填 provider 给的 host，Port 填 provider 给的 port，Username 通常是 `root`，Key 用你放到 RunPod 的 private/public key pair。
 
+
+## Chromium：黑色主题与固定插件
+
+Arch baseline 只使用官方仓库 `chromium`，不安装、不构建、不引用 AUR 浏览器包。
+
+为什么这更安全、更容易维护：
+
+- 更新统一走 `sudo pacman -Syu`，跟系统安全更新同一条路径。
+- 包来自 Arch 官方仓库签名包，不需要在本机执行 AUR PKGBUILD / `makepkg`。
+- 少一个浏览器来源，窗口规则、policy、debug 路径都更简单。
+- 真正的额外风险主要来自浏览器插件；所以只固定你明确要的三个插件。
+
+
+默认 Chromium 启动参数在 `arch/sway/config`：
+
+```sway
+set $browser chromium --ozone-platform=wayland --force-dark-mode --enable-features=WebUIDarkMode
+```
+
+含义：
+
+- `--ozone-platform=wayland`：原生 Wayland，减少 XWayland 中间层。
+- `--force-dark-mode`：浏览器 UI 走黑色模式。
+- `--enable-features=WebUIDarkMode`：Chromium 内部页面也尽量黑色。
+- 网站内容交给 Dark Reader；不要再开 Chromium 的全网页强制反色，避免和 Dark Reader 双重处理。
+
+插件通过 Chromium managed policy 自动安装，配置文件是：
+
+```text
+arch/chromium/policies/managed/10-gral-extensions.json
+```
+
+安装后落到系统位置：
+
+```text
+/etc/chromium/policies/managed/10-gral-extensions.json
+```
+
+固定插件：
+
+| 插件 | Chrome Web Store ID | 用途 |
+|---|---|---|
+| Vimium | `dbepggeogbaibhgnhhndojpepiihcmeb` | Vim 风格键盘浏览 |
+| Dark Reader | `eimadpbcbfnmbkopoojfekhnkhdbieeh` | 网页 dark mode |
+| Slowed + Reverb | `bombmeelannelmofjhiopdoedljnpech` | 浏览器内实时 slowed/reverb 音频效果 |
+
+验证：
+
+```sh
+chromium chrome://policy
+chromium chrome://extensions
+```
+
+注意：这些插件用 `force_installed`，所以会作为 managed extensions 自动安装并保持存在。这符合“这台 Arch 工作机只要这些插件”的目标；如果以后想允许手动删除，把 policy 里的 `force_installed` 改成 `normal_installed`。
+
+## 音频输出：terminal 快速切换 USB-C 耳机 / Bluetooth 音响
+
+Arch 音频走 PipeWire + WirePlumber；`pipewire-pulse` 提供 PulseAudio 兼容层，`libpulse` 提供 `pactl`，`install.sh` 会启用 `bluetooth.service`。安装后 `arch/install.sh` 会把脚本 link 到：
+
+```text
+~/.local/bin/audio-output
+```
+
+常用命令：
+
+```sh
+# 看当前默认输出和所有 sink 名称
+audio-output list
+
+# 切到 USB-C / USB DAC / 耳机类输出
+audio-output usb
+
+# 切到 Bluetooth / bluez / A2DP / speaker 类输出
+audio-output bt
+
+# 在 USB-C 与 Bluetooth 之间来回切
+audio-output toggle
+
+# 名字不匹配时，用正则手动选；先从 audio-output list 里复制关键字
+audio-output match 'bose|sony|soundcore|stax|topping|usb'
+```
+
+脚本会做两件事：先设置新的默认 sink，再把当前正在播放的 Chromium/播放器 stream 移过去。所以它比只点 GUI 更适合 terminal 快速切换。
+
+第一次配 Bluetooth 音响：
+
+```sh
+bluetoothctl
+power on
+agent on
+default-agent
+scan on
+pair <MAC>
+trust <MAC>
+connect <MAC>
+quit
+```
+
+如果音响已连接但没有声音，先检查 profile/sink：
+
+```sh
+wpctl status
+audio-output list
+pavucontrol
+```
+
+优先用 `audio-output bt` / `audio-output usb`；只有蓝牙 profile、麦克风模式等复杂问题才打开 `pavucontrol`。
+
 ## Foot 配置
 
 实际配置只维护在 `arch/foot/foot.ini`。它使用 JetBrainsMono Nerd Font、Gruvbox dark medium，颜色与 `nvim/lua/plugins/colorscheme.lua` 对齐；不做透明。
+
+## Tmux status bar
+
+Sway 不启动 `swaybar`，唯一常驻状态栏是 Foot 里的 tmux bottom bar。Arch status-right 由 `arch/tmux-system-status.sh` 提供，顺序固定为：
+
+```text
+CPU负载/CPU温度  GPU负载/GPU温度  月-日 时:分
+```
+
+例子：
+
+```text
+07%/48°  23%/55°  05-15 14:32
+```
+
+电池信息已移除。CPU 或 GPU 任一负载超过 `90%`，或温度超过 `60°`，对应的 `负载/温度` 整组会变成和 Nvim dirty/ahead branch 相同的橙色 `#d8a657`。GPU 数据优先读 `nvidia-smi --query-gpu=utilization.gpu,temperature.gpu`；如果还没安装 NVIDIA driver / `nvidia-utils`，会显示 `--%/--°`，不影响 tmux 启动。Mac 的 tmux status 使用同一阈值和颜色逻辑显示 CPU，并保留原来的电池百分比。
 
 ## Zsh completion / plugins
 
@@ -386,7 +578,7 @@ ssh runpod-main
 
 ## Sway 配置
 
-实际配置只维护在 `arch/sway/config`。工作模型是一个 workspace，两个 floating app：Foot/tmux 与 Chrome；Sway 只负责启动、摆放、切换、移动/resize、音量/亮度通知，常驻状态放在 `tmux`。
+实际配置只维护在 `arch/sway/config`。工作模型是一个 workspace，两个 floating app：Foot/tmux 与 Chromium；Sway 只负责启动、摆放、切换、移动/resize、音量/亮度通知；不启动 swaybar，不设置壁纸，背景固定纯黑，常驻状态放在 `tmux`。
 
 首次进入后检查真实 app id/class：
 
@@ -394,13 +586,32 @@ ssh runpod-main
 swaymsg -t get_tree | jq '.. | objects | select(.type? == "con") | {name, app_id, class}'
 ```
 
-外接屏幕与窗口位置按真实输出调整：
+窗口位置不是硬编码在 `for_window` 里，而是由 `~/.local/bin/sway-workbench-layout` 根据最大 active output 计算。布局是 1/9 对角错位 cascade：
+
+- Chromium：贴住屏幕左上角；右边和下边各留 `1/9` 屏幕空白，所以尺寸是 `8/9 width × 8/9 height`。
+- Foot/tmux：贴住屏幕右下角；左边和上边各留 `1/9` 屏幕空白，所以尺寸同样是 `8/9 width × 8/9 height`。
+- 两个窗口会重叠；脚本最后 focus Foot，让 terminal 在右下角作为前景，Chromium 从左上方露出。
+- 多显示器：默认选择面积最大的 active output，避免固定 `(0,0)` 坐标落到错误屏幕。
+
+
+核心操作：
+
+- `Mod+Tab` / `Mod+Shift+Tab`：在 Foot 和 Chromium 之间切换 focus。
+- 按住 `Mod` + 鼠标左键拖动：移动 floating window。
+- 按住 `Mod` + 鼠标右键拖动：调整 floating window 大小。
+- `Mod+Shift+R`：恢复默认 1/9 对角错位布局。
+- `Mod+Shift+Q`：退出整个 Sway session；Foot 和 Chromium 会关闭，tmux server/session 保留，屏幕回到 TTY login prompt。
+
+手动检查与重新套布局：
 
 ```sh
 swaymsg -t get_outputs
-swaymsg resize set width 1450 px height 950 px
-swaymsg move position 160 100
+swaymsg -t get_tree | jq '.. | objects | select(.type? == "con") | {name, app_id, class}'
+sway-workbench-layout
+# 或在 Sway 里按 Mod+Shift+R
 ```
+
+如果想微调错开程度，改 `arch/bin/sway-workbench-layout` 里的 `gap_x="$((ow / 9))"` / `gap_y="$((oh / 9))"` 分母；改完后在 Sway 里按 `Mod+Shift+R` 即可验证，不需要重启。
 
 ## Mako 通知
 
@@ -577,7 +788,7 @@ WHISPER_LANGUAGE=zh whisper-dictation-toggle
 WHISPER_TASK=translate whisper-dictation-toggle
 ```
 
-注意：`Ctrl+F` 是 Sway 全局快捷键，会被桌面层先吃掉；在 Chrome/Nvim 里就不能再用它做 find。如果这点烦，再把 `arch/sway/config` 里的 binding 改成别的组合。
+注意：`Ctrl+F` 是 Sway 全局快捷键，会被桌面层先吃掉；在 Chromium/Nvim 里就不能再用它做 find。如果这点烦，再把 `arch/sway/config` 里的 binding 改成别的组合。
 
 ### Debug
 
@@ -593,29 +804,21 @@ cat "$XDG_RUNTIME_DIR/gral-whisper-dictation/whisper.log"
 - 没录到声音：先检查 `wpctl status` / `pavucontrol` 的默认 input device。
 - 转写太慢：先用 `WHISPER_MODEL=medium`；GPU 确认后再处理 CUDA/ROCm。
 
-## Chrome / Citrix
+## Chromium / Citrix
 
-Chrome 不是 pacman 官方仓库包，所以不放进 `arch/packages.txt`。`arch/install.sh` 会直接从 AUR `google-chrome` checkout 到 `~/.cache/gral-aur/google-chrome`，然后用 `makepkg -si --noconfirm` 安装。这样不引入 `yay` 这类 AUR helper，保持最小。
+优先尝试 Chromium 网页版 Workspace。若网页版能传 Escape、Ctrl 等关键键并且音频可用，就不安装 native Citrix。若必须 native client，再单独安装 AUR `icaclient` 及其 runtime 依赖；这些依赖不进入首轮大表。
 
-优先尝试 Chrome 网页版 Workspace。若网页版能传 Escape、Ctrl 等关键键并且音频可用，就不安装 native Citrix。若必须 native client，再单独安装 AUR `icaclient` 及其 runtime 依赖；这些依赖不进入大表。
-
-Chrome Wayland 启动命令在 Sway 里是：
+Chromium Wayland 启动命令在 Sway 里由 `arch/sway/config` 管理：
 
 ```sh
-google-chrome-stable --ozone-platform=wayland
+chromium --ozone-platform=wayland --force-dark-mode --enable-features=WebUIDarkMode
 ```
 
-如果 Chrome AUR 构建失败，单独重试：
+浏览器安装、更新、卸载都只走 pacman：
 
 ```sh
-cd ~/.cache/gral-aur/google-chrome
-makepkg -si
-```
-
-如果只是想先跳过 Chrome、把 terminal 环境跑起来：
-
-```sh
-GRAL_SKIP_CHROME=1 ./arch/install.sh
+sudo pacman -Syu chromium
+sudo pacman -Rns chromium
 ```
 
 ## 风扇/温度
@@ -630,11 +833,11 @@ GRAL_SKIP_CHROME=1 ./arch/install.sh
 - [ ] `zsh`、`tmux`、`nvim`、`lf` 可启动。
 - [ ] `~/.vimrc` 指向 shared `nvim/vimrc`。
 - [ ] Foot 使用 JetBrainsMono Nerd Font；颜色与 Nvim Gruvbox dark 一致；无透明背景。
-- [ ] Sway 自动打开 Foot/tmux + Chrome；`$mod+Tab` 在两个 app 间切换。
-- [ ] `$mod+Shift+t` 打开 Foot/tmux；`$mod+Shift+g` 打开 Chrome。
-- [ ] `$mod+h/j/k/l` focus；`$mod+Shift+h/j/k/l` move；`$mod+Shift+r` 进入 resize mode。
+- [ ] Sway 自动打开 Foot/tmux + Chromium；`$mod+Tab` 在两个 app 间切换；没有 swaybar，背景纯黑无壁纸。
+- [ ] `$mod+Shift+t` 打开 Foot/tmux；`$mod+Shift+g` 打开 Chromium。
+- [ ] `$mod+h/j/k/l` focus；`$mod+Shift+h/j/k/l` move；`$mod+Shift+r` 恢复 1/9 默认布局。
 - [ ] 音量/静音/亮度快捷键可用，并通过 Mako 弹出临时通知。
-- [ ] `fcitx5` 可输入中文；Chrome/Foot/Nvim 中都可用。
-- [ ] Bluetooth 鼠标/键盘/耳机/mic 可连接并能在 PipeWire 中切换。
+- [ ] `fcitx5` 可输入中文；Chromium/Foot/Nvim 中都可用。
+- [ ] Bluetooth 鼠标/键盘/耳机/mic 可连接；`audio-output usb` / `audio-output bt` 可在 PipeWire 中切换输出。
 - [ ] Snapper 快照和 `grub-btrfs` 可用，升级前后有快照。
 - [ ] Star storage：`rclone` 可访问 R2/S3；项目 Python/Rust 工具链可跑基本命令。

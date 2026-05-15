@@ -1,0 +1,53 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+# Fit the floating Foot/tmux + Chromium workbench to the largest active Sway output.
+# Layout: 1/9 diagonal cascade.
+# - Chromium touches the output's top-left corner and leaves 1/9 width/height open
+#   on the right/bottom edges.
+# - Foot touches the output's bottom-right corner and leaves 1/9 width/height open
+#   on the left/top edges.
+# Coordinates use Sway logical pixels, so output scaling is already accounted for.
+
+layout_output="$({
+  swaymsg -t get_outputs -r | jq -r '
+    [.[] | select(.active)]
+    | max_by(.rect.width * .rect.height)
+    | [.rect.x, .rect.y, .rect.width, .rect.height]
+    | @tsv
+  '
+})"
+
+if [ -z "$layout_output" ] || [ "$layout_output" = "null" ]; then
+  echo "No active Sway output found." >&2
+  exit 1
+fi
+
+read -r ox oy ow oh <<< "$layout_output"
+if [ -z "${ox:-}" ] || [ -z "${oy:-}" ] || [ -z "${ow:-}" ] || [ -z "${oh:-}" ]; then
+  echo "Unexpected Sway output geometry: $layout_output" >&2
+  exit 1
+fi
+
+gap_x="$((ow / 9))"
+gap_y="$((oh / 9))"
+window_w="$((ow - gap_x))"
+window_h="$((oh - gap_y))"
+
+browser_x="$ox"
+browser_y="$oy"
+foot_x="$((ox + gap_x))"
+foot_y="$((oy + gap_y))"
+
+# Criteria are intentionally duplicated for Chromium because app_id/class can differ
+# between Wayland-native and XWayland fallback windows.
+swaymsg '[app_id="chromium"] floating enable, resize set width '"$window_w"' px height '"$window_h"' px, move position '"$browser_x"' '"$browser_y" >/dev/null || true
+swaymsg '[class="Chromium"] floating enable, resize set width '"$window_w"' px height '"$window_h"' px, move position '"$browser_x"' '"$browser_y" >/dev/null || true
+swaymsg '[app_id="foot"] floating enable, resize set width '"$window_w"' px height '"$window_h"' px, move position '"$foot_x"' '"$foot_y" >/dev/null || true
+swaymsg '[app_id="foot"] focus' >/dev/null || true
+
+printf 'output=%sx%s+%s+%s gap=%sx%s chromium=%sx%s+%s+%s foot=%sx%s+%s+%s\n' \
+  "$ow" "$oh" "$ox" "$oy" \
+  "$gap_x" "$gap_y" \
+  "$window_w" "$window_h" "$browser_x" "$browser_y" \
+  "$window_w" "$window_h" "$foot_x" "$foot_y"
