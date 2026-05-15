@@ -287,6 +287,66 @@ is_number() {
     awk -v value="$1" 'BEGIN { exit !(value ~ /^[0-9]+([.][0-9]+)?$/) }'
 }
 
+memory_used_gib_from_free() {
+    command -v free >/dev/null 2>&1 || return 1
+    free -b 2>/dev/null \
+        | awk '$1 ~ /^Mem:/ && $3 ~ /^[0-9]+$/ { printf "%.1f\n", $3 / 1073741824; exit }'
+}
+
+memory_used_gib_from_vm_stat() {
+    command -v vm_stat >/dev/null 2>&1 || return 1
+
+    vm_stat 2>/dev/null | awk '
+        /^Mach Virtual Memory Statistics:/ {
+            if (match($0, /page size of [0-9]+ bytes/)) {
+                page_size_text = substr($0, RSTART, RLENGTH)
+                gsub(/[^0-9]/, "", page_size_text)
+                page_size = page_size_text + 0
+            }
+        }
+        /^Pages active:/ { active = $3; gsub(/\./, "", active) }
+        /^Pages wired down:/ { wired = $4; gsub(/\./, "", wired) }
+        /^Pages occupied by compressor:/ { compressed = $5; gsub(/\./, "", compressed) }
+        END {
+            if (page_size <= 0) {
+                page_size = 4096
+            }
+            used_pages = active + wired + compressed
+            if (used_pages > 0) {
+                printf "%.1f\n", used_pages * page_size / 1073741824
+            } else {
+                exit 1
+            }
+        }
+    '
+}
+
+memory_used_gib() {
+    mem="$(memory_used_gib_from_free)"
+    if is_number "$mem"; then
+        printf '%s\n' "$mem"
+        return 0
+    fi
+
+    mem="$(memory_used_gib_from_vm_stat)"
+    if is_number "$mem"; then
+        printf '%s\n' "$mem"
+        return 0
+    fi
+
+    return 1
+}
+
+formatted_memory_status() {
+    mem="$(memory_used_gib)"
+    if is_number "$mem"; then
+        awk -v mem="$mem" 'BEGIN { printf "%.1fG", mem }'
+        return 0
+    fi
+
+    printf -- '--.-G'
+}
+
 formatted_status_pair() {
     usage="$1"
     temp="$2"
@@ -351,4 +411,4 @@ formatted_gpu_status() {
     formatted_status_pair "$usage" "$temp"
 }
 
-printf ' %s  %s ' "$(formatted_cpu_status)" "$(formatted_gpu_status)"
+printf ' %s  %s  %s ' "$(formatted_cpu_status)" "$(formatted_gpu_status)" "$(formatted_memory_status)"

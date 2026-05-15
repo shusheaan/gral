@@ -46,7 +46,8 @@ opt.foldlevel = 99
 opt.foldlevelstart = 1
 
 -- Timeouts
-opt.timeoutlen = 10000
+opt.timeoutlen = 300
+opt.ttimeoutlen = 10
 
 -- Scroll
 opt.scrolloff = 8

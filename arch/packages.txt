@@ -79,3 +79,12 @@ uv                           # 唯一默认 Python env/package/tool 管理器。
 rustup                       # Rust toolchain 管理器。
 nodejs                       # Node.js 运行时。
 npm                          # Node.js 包管理器。
+stylua                       # Lua formatter；Nvim 配置保存时使用。
+taplo-cli                    # TOML formatter/LSP CLI；Cargo.toml 与配置文件格式化。
+yamlfmt                      # YAML formatter；Nvim YAML format-on-save 使用。
+marksman                     # Markdown language server；Nvim markdown LSP 使用。
+ruff                         # Python lint/formatter；Nvim ruff LSP 和 format-on-save 使用。
+mypy                         # Python type checker；Nvim async lint 使用。
+python-polars                # Star/数据工作流默认 DataFrame 库。
+python-pytest                # Python 测试 runner。
+python-hypothesis            # Python property tests。

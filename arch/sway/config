@@ -18,8 +18,14 @@ set $gray #a89984
 set $darkgray #3c3836
 set $inactive #928374
 
-# No wallpaper: keep the compositor background pure black.
-output * bg #000000 solid_color
+# No wallpaper: keep the compositor background on Gruvbox dark hard.
+# Slightly darker than the main Gruvbox #282828, but not pure black.
+output * bg #1d2021 solid_color
+
+# Latency tuning: present fresher frames. If a monitor flickers or drops frames,
+# change max_render_time to 2-4 or disable adaptive_sync for that output.
+output * max_render_time 1
+output * adaptive_sync on
 
 # Environment for DBus/session detection/input method.
 exec systemctl --user import-environment WAYLAND_DISPLAY SWAYSOCK XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE
@@ -38,6 +44,12 @@ input * {
     repeat_rate 80
 }
 
+# Direct pointer feel: no acceleration curve, no compositor-side pointer scaling.
+input type:pointer {
+    accel_profile flat
+    pointer_accel 0
+}
+
 # Floating two-window layout. arch/bin/sway-workbench-layout computes sizes/positions
 # from the largest active output. Hold Mod and drag floating windows with the mouse:
 # left button moves, right button resizes.
@@ -45,8 +57,8 @@ floating_modifier $mod normal
 default_border pixel 1
 default_floating_border pixel 1
 client.focused $gray $gray $black $fg $gray
-client.focused_inactive $darkgray $bg $gray $fg $darkgray
-client.unfocused $black $black $gray $fg $black
+client.focused_inactive $gray $bg $gray $fg $gray
+client.unfocused $gray $black $gray $fg $gray
 client.urgent $red $red $fg $fg $red
 for_window [app_id="foot"] floating enable
 for_window [app_id="chromium"] floating enable
@@ -57,7 +69,7 @@ bindsym $mod+Tab focus next
 bindsym $mod+Shift+Tab focus prev
 bindsym $mod+Shift+t exec $term
 bindsym $mod+Shift+g exec $browser
-bindsym $mod+f fullscreen toggle
+bindsym $mod+Shift+f fullscreen toggle
 bindsym $mod+space floating toggle
 bindsym $mod+q kill
 bindsym $mod+r reload

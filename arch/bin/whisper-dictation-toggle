@@ -6,8 +6,23 @@ if [ -n "${XDG_RUNTIME_DIR:-}" ]; then
 else
     state_dir="/tmp/gral-whisper-dictation-$UID"
 fi
-venv_dir="${WHISPER_VENV:-$HOME/.local/share/gral-whisper/.venv}"
-python_bin="$venv_dir/bin/python"
+default_venv_dir="$HOME/.local/share/gral-whisper/.venv"
+
+system_python_ready() {
+    command -v python >/dev/null 2>&1 || return 1
+    python - <<'PY' >/dev/null 2>&1
+import torch
+import whisper
+PY
+}
+
+if [ -n "${WHISPER_VENV:-}" ]; then
+    python_bin="$WHISPER_VENV/bin/python"
+elif system_python_ready; then
+    python_bin="$(command -v python)"
+else
+    python_bin="$default_venv_dir/bin/python"
+fi
 pid_file="$state_dir/recording.pid"
 audio_file="$state_dir/input.wav"
 text_file="$state_dir/output.txt"
@@ -42,7 +57,7 @@ start_recording() {
 transcribe_to_clipboard() {
     {
         command -v wl-copy >/dev/null 2>&1 || fail "missing wl-copy"
-        [ -x "$python_bin" ] || fail "missing venv; run whisper-dictation-setup first"
+        [ -x "$python_bin" ] || fail "missing system Whisper Python or venv; run whisper-dictation-setup first"
         [ -s "$audio_file" ] || fail "recording is empty"
 
         notify "Whisper" "Recording stopped; transcribing locally..."

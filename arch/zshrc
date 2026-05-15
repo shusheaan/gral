@@ -10,14 +10,7 @@ sammy_git_prompt() {
   local branch
   branch="$(command git symbolic-ref --quiet --short HEAD 2>/dev/null || command git rev-parse --short HEAD 2>/dev/null)" || return 0
 
-  local suffix
-  if [ -n "$(command git status --porcelain --ignore-submodules=dirty 2>/dev/null)" ]; then
-    suffix="*)"
-  else
-    suffix=")"
-  fi
-
-  printf "(%s%s" "$branch" "$suffix"
+  printf "(%s)" "$branch"
 }
 
 PS1='%{$fg[white]%}%c$(sammy_git_prompt)$ %{$reset_color%}'
@@ -73,7 +66,7 @@ fi
 # System / desktop.
 alias yo='sudo pacman -Syu'
 alias refresh='source ~/.zshrc'
-alias gc='google-chrome-stable'
+alias gc='chromium'
 alias bt='bluetoothctl'
 alias mute='pamixer -t'
 alias unmute='pamixer --unmute'
@@ -114,7 +107,8 @@ sway() {
     return 1
   fi
 
-  exec /usr/bin/sway "$@"
+  # Arch GUI baseline is NVIDIA-first; always pass wlroots' explicit opt-in.
+  exec /usr/bin/sway --unsupported-gpu "$@"
 }
 
 # tmux.

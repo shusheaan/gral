@@ -96,6 +96,22 @@ enable_system_services() {
     fi
 }
 
+warm_neovim() {
+    if [ "${GRAL_SKIP_NVIM_BOOTSTRAP:-0}" = "1" ]; then
+        echo "Skipping Neovim bootstrap because GRAL_SKIP_NVIM_BOOTSTRAP=1."
+        return
+    fi
+
+    if ! command -v nvim >/dev/null 2>&1; then
+        echo "nvim not found; skipping Neovim bootstrap."
+        return
+    fi
+
+    echo "Bootstrapping Neovim plugins and Mason tools."
+    nvim --headless "+Lazy! sync" +qa
+    nvim --headless "+MasonUpdate" +qa || true
+}
+
 install_packages
 install_system_policy
 enable_system_services
@@ -172,6 +188,7 @@ if command -v systemctl >/dev/null 2>&1; then
     systemctl --user enable --now pipewire.socket pipewire-pulse.socket wireplumber.service || true
 fi
 
+warm_neovim
 
 cat <<MSG
 Installed Arch package list and linked dotfiles from ./arch.
@@ -180,9 +197,10 @@ Next:
   1. Log out of this TTY, then log back in once so ~/.zprofile and the zsh login shell are clean.
   2. Start GUI manually when needed: sway
   3. Sway should auto-start Foot/tmux and Chromium.
-  4. Mod+Shift+Q exits Sway back to the TTY login prompt; tmux sessions stay detached.
-  5. SSH is enabled; attach from another device with: tmux attach -t work
-  6. Tailscale daemon is enabled; authenticate once with: sudo tailscale up --operator="$USER" --qr
-  7. In Tailscale admin, disable key expiry for this machine.
-  8. After Termius-over-Tailscale works, restrict SSH to tailscale0 with UFW per arch/readme.md.
+  4. Neovim plugins and Mason-managed LSP tools have been bootstrapped unless GRAL_SKIP_NVIM_BOOTSTRAP=1.
+  5. Mod+Shift+Q exits Sway back to the TTY login prompt; tmux sessions stay detached.
+  6. SSH is enabled; attach from another device with: tmux attach -t work
+  7. Tailscale daemon is enabled; authenticate once with: sudo tailscale up --operator="$USER" --qr
+  8. In Tailscale admin, disable key expiry for this machine.
+  9. After Termius-over-Tailscale works, restrict SSH to tailscale0 with UFW per arch/readme.md.
 MSG

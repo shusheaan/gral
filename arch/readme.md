@@ -438,7 +438,6 @@ ssh runpod-main
 
 手机 Termius 连接 RunPod 也是同一个逻辑：Host 填 provider 给的 host，Port 填 provider 给的 port，Username 通常是 `root`，Key 用你放到 RunPod 的 private/public key pair。
 
-
 ## Chromium：黑色主题与固定插件
 
 Arch baseline 只使用官方仓库 `chromium`，不安装、不构建、不引用 AUR 浏览器包。

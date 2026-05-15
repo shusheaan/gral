@@ -1,19 +1,21 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-# NVIDIA + CUDA + Python GPU development baseline for Arch Linux.
+# NVIDIA + CUDA + system Python GPU development baseline for Arch Linux.
 #
 # Target machine: modern NVIDIA desktop GPU, e.g. RTX 5060 Ti.
 # Run after ./arch/install.sh:
 #   ./arch/python-gpu-dev.sh
 #
-# This intentionally stays out of arch/packages.txt because CUDA/PyTorch/OpenMM
+# This intentionally stays out of arch/packages.txt because CUDA/PyTorch packages
 # are large, GPU-specific, and not needed on every Arch install.
+#
+# Policy: no shared Python venv. PyTorch/Whisper are installed as Arch system
+# packages through pacman.
 
-VENV_DIR="${GRAL_PYTHON_GPU_VENV:-/opt/gral-python-gpu}"
-OPENMM_CUDA_EXTRA="${GRAL_OPENMM_CUDA_EXTRA:-cuda13}"
+PYTHON_BIN="${GRAL_SYSTEM_PYTHON:-/usr/bin/python}"
 WHISPER_MODEL_TO_PREFETCH="${GRAL_WHISPER_MODEL:-${WHISPER_MODEL:-large-v3}}"
-ENV_FILE="$HOME/.config/environment.d/92-gral-python-gpu.conf"
+OLD_ENV_FILE="$HOME/.config/environment.d/92-gral-python-gpu.conf"
 
 say() {
     print -P "%F{green}==>%f $*"
@@ -87,7 +89,7 @@ install_arch_packages() {
         "${kernel_headers[@]}"
     )
 
-    say "Installing NVIDIA/CUDA/Python GPU packages with pacman."
+    say "Installing NVIDIA/CUDA/system Python GPU packages with pacman."
     sudo pacman -Syu --needed "${packages[@]}"
 }
 
@@ -98,49 +100,11 @@ refresh_kernel_images() {
     fi
 }
 
-prepare_global_venv() {
-    local first_child
-
-    need_cmd uv
-
-    if [ -d "$VENV_DIR" ] && [ ! -f "$VENV_DIR/pyvenv.cfg" ]; then
-        first_child="$(find "$VENV_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null || true)"
-        if [ -n "$first_child" ]; then
-            die "$VENV_DIR exists but is not a Python venv. Move it away or set GRAL_PYTHON_GPU_VENV."
-        fi
+cleanup_old_user_environment() {
+    if [ -f "$OLD_ENV_FILE" ] && grep -q 'Created by gral/arch/python-gpu-dev.sh' "$OLD_ENV_FILE"; then
+        say "Removing old shared-venv environment file: $OLD_ENV_FILE"
+        rm -f "$OLD_ENV_FILE"
     fi
-
-    sudo install -d -m 755 -o "$USER" -g "$(id -gn)" "$VENV_DIR"
-
-    if [ ! -f "$VENV_DIR/pyvenv.cfg" ]; then
-        say "Creating shared GPU Python venv at $VENV_DIR with system-site-packages."
-        uv venv --system-site-packages "$VENV_DIR"
-    elif ! grep -q '^include-system-site-packages = true$' "$VENV_DIR/pyvenv.cfg"; then
-        die "$VENV_DIR exists but does not include system-site-packages. Recreate it or choose a new GRAL_PYTHON_GPU_VENV."
-    else
-        say "Using existing shared GPU Python venv at $VENV_DIR."
-    fi
-}
-
-install_openmm() {
-    if [ "${GRAL_SKIP_OPENMM:-0}" = "1" ]; then
-        say "Skipping OpenMM because GRAL_SKIP_OPENMM=1."
-        return
-    fi
-
-    say "Installing OpenMM GPU platform into $VENV_DIR using extra: $OPENMM_CUDA_EXTRA."
-    uv pip install --python "$VENV_DIR/bin/python" -U "openmm[$OPENMM_CUDA_EXTRA]"
-}
-
-write_user_environment() {
-    say "Writing user environment: $ENV_FILE"
-    install -d -m 700 "$HOME/.config/environment.d"
-    cat > "$ENV_FILE" <<EOF
-# Created by gral/arch/python-gpu-dev.sh.
-# This file is sourced by ~/.zprofile in the gral Arch flow before Sway starts.
-GRAL_PYTHON_GPU_VENV=$VENV_DIR
-WHISPER_VENV=$VENV_DIR
-EOF
 }
 
 write_user_wrappers() {
@@ -149,21 +113,17 @@ write_user_wrappers() {
     say "Writing helper wrappers into $bin_dir."
     install -d -m 755 "$bin_dir"
 
-    cat > "$bin_dir/python-gpu" <<EOF
+    cat > "$bin_dir/python-gpu" <<EOF2
 #!/bin/sh
-exec "$VENV_DIR/bin/python" "\$@"
-EOF
+exec "$PYTHON_BIN" "\$@"
+EOF2
     chmod 755 "$bin_dir/python-gpu"
 
-    cat > "$bin_dir/pip-gpu" <<EOF
-#!/bin/sh
-exec uv pip --python "$VENV_DIR/bin/python" "\$@"
-EOF
-    chmod 755 "$bin_dir/pip-gpu"
+    rm -f "$bin_dir/pip-gpu"
 
-    cat > "$bin_dir/torch-test-gpu" <<EOF
+    cat > "$bin_dir/torch-test-gpu" <<EOF2
 #!/bin/sh
-exec "$VENV_DIR/bin/python" - <<'PY'
+exec "$PYTHON_BIN" - <<'PY'
 import torch
 
 print("torch_version=", torch.__version__)
@@ -176,7 +136,7 @@ print("torch_cuda_capability=", torch.cuda.get_device_capability(0))
 x = torch.ones((1024, 1024), device="cuda")
 print("cuda_tensor_sum=", float(x.sum().item()))
 PY
-EOF
+EOF2
     chmod 755 "$bin_dir/torch-test-gpu"
 }
 
@@ -185,8 +145,8 @@ nvidia_ready() {
 }
 
 validate_torch() {
-    say "Validating PyTorch CUDA from $VENV_DIR."
-    "$VENV_DIR/bin/python" - <<'PY'
+    say "Validating system PyTorch CUDA from $PYTHON_BIN."
+    "$PYTHON_BIN" - <<'PY'
 import sys
 import torch
 
@@ -204,36 +164,16 @@ PY
 }
 
 validate_imports() {
-    say "Validating Python imports."
-    GRAL_SKIP_OPENMM="${GRAL_SKIP_OPENMM:-0}" "$VENV_DIR/bin/python" - <<'PY'
-import os
+    say "Validating system Python imports."
+    "$PYTHON_BIN" - <<'PY'
 import polars
 import torch
 import whisper
 
-if os.environ.get("GRAL_SKIP_OPENMM") == "1":
-    print("openmm_version= skipped")
-else:
-    import openmm
-    print("openmm_version=", openmm.version.version)
 print("polars_version=", polars.__version__)
 print("torch_import_ok=", torch.__version__)
 print("whisper_import_ok=", whisper.__file__)
 PY
-}
-
-validate_openmm() {
-    if [ "${GRAL_SKIP_OPENMM:-0}" = "1" ]; then
-        say "Skipping OpenMM test because GRAL_SKIP_OPENMM=1."
-        return
-    fi
-    if [ "${GRAL_SKIP_OPENMM_TEST:-0}" = "1" ]; then
-        say "Skipping OpenMM test because GRAL_SKIP_OPENMM_TEST=1."
-        return
-    fi
-
-    say "Running OpenMM installation test."
-    "$VENV_DIR/bin/python" -m openmm.testInstallation
 }
 
 prefetch_whisper_model() {
@@ -242,8 +182,8 @@ prefetch_whisper_model() {
         return
     fi
 
-    say "Pre-downloading Whisper model '$WHISPER_MODEL_TO_PREFETCH' with the shared GPU Python."
-    WHISPER_MODEL="$WHISPER_MODEL_TO_PREFETCH" "$VENV_DIR/bin/python" - <<'PY'
+    say "Pre-downloading Whisper model '$WHISPER_MODEL_TO_PREFETCH' with system Python."
+    WHISPER_MODEL="$WHISPER_MODEL_TO_PREFETCH" "$PYTHON_BIN" - <<'PY'
 import os
 import torch
 import whisper
@@ -272,16 +212,18 @@ main() {
 
     install_arch_packages
     refresh_kernel_images
-    prepare_global_venv
-    install_openmm
-    write_user_environment
+    cleanup_old_user_environment
+
+    if [ ! -x "$PYTHON_BIN" ]; then
+        die "system Python not found or not executable: $PYTHON_BIN"
+    fi
+
     write_user_wrappers
     validate_imports
 
     if nvidia_ready; then
         nvidia-smi
         validate_torch
-        validate_openmm
         prefetch_whisper_model
     else
         warn "nvidia-smi is not ready yet. If the driver was just installed, reboot, log in, then rerun ./arch/python-gpu-dev.sh."
@@ -290,17 +232,14 @@ main() {
 
     cat <<MSG
 
-GPU Python baseline is configured.
-
-Persistent user env:
-  $ENV_FILE
+System GPU Python baseline is configured.
 
 Useful commands after a fresh login:
   python-gpu -c 'import torch; print(torch.cuda.is_available())'
   torch-test-gpu
-  python-gpu -m openmm.testInstallation
   whisper-dictation-toggle
 
+No shared Python venv is created.
 If NVIDIA packages were installed in this run, reboot once before judging CUDA.
 MSG
 }
