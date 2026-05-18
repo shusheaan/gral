@@ -16,8 +16,18 @@ link_managed_path() {
     ln -sfn "$source" "$target"
 }
 
+chmod_readable_tree() {
+    local path="$1"
+
+    [ -e "$path" ] || return 0
+    find "$path" -type d -exec chmod 755 {} +
+    find "$path" -type f -exec chmod 644 {} +
+}
+
 sync_claude() {
     # agent-memory and project memory are machine-local working state.
+    chmod_readable_tree "$GRAL/claude"
+
     link_managed_path "$GRAL/claude/settings.json" "$HOME/.claude/settings.json"
     link_managed_path "$GRAL/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
     link_managed_path "$GRAL/claude/agents" "$HOME/.claude/agents"
@@ -26,6 +36,8 @@ sync_claude() {
 }
 
 sync_codex() {
+    chmod_readable_tree "$GRAL/codex"
+
     mkdir -p "$HOME/.codex/rules"
     mkdir -p "$HOME/.codex/skills"
     mkdir -p "$HOME/.agents/skills"

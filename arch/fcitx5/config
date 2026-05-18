@@ -1,0 +1,21 @@
+# Fcitx5 global hotkeys managed by gral.
+# Keep Ctrl-J free so terminals and editors receive it as newline/linefeed.
+
+[Hotkey]
+EnumerateWithTriggerKeys=True
+AltTriggerKeys=
+EnumerateForwardKeys=
+EnumerateBackwardKeys=
+ActivateKeys=
+DeactivateKeys=
+PrevPage=
+NextPage=
+PrevCandidate=
+NextCandidate=
+TogglePreedit=
+
+[Hotkey/TriggerKeys]
+0=Control+space
+
+[Hotkey/EnumerateForwardKeys]
+0=Control+Shift+space

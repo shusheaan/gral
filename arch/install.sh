@@ -150,6 +150,7 @@ link_managed_path "$GRAL/lf/pv.sh" "$HOME/.config/lf/pv.sh"
 # Minimal Wayland GUI layer.
 link_managed_path "$ARCH/sway/config" "$HOME/.config/sway/config"
 link_managed_path "$ARCH/foot/foot.ini" "$HOME/.config/foot/foot.ini"
+link_managed_path "$ARCH/fcitx5/config" "$HOME/.config/fcitx5/config"
 link_managed_path "$ARCH/mako/config" "$HOME/.config/mako/config"
 sudo install -Dm644 "$ARCH/chromium/policies/managed/10-gral-extensions.json" /etc/chromium/policies/managed/10-gral-extensions.json
 for env_file in "$ARCH"/environment.d/*.conf(N); do

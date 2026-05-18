@@ -33,15 +33,15 @@ exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK XDG_C
 exec fcitx5 -d
 exec mako
 
-# Auto-start the two-window workbench, then fit it to the real monitor size.
+# Auto-start the two-window workbench.
 exec $term
 exec $browser
-exec sh -c 'sleep 1; "$HOME/.local/bin/sway-workbench-layout"; sleep 2; "$HOME/.local/bin/sway-workbench-layout"; sleep 4; "$HOME/.local/bin/sway-workbench-layout"'
+exec sh -c 'sleep 2; swaymsg workspace number 1'
 
 input * {
     xkb_layout us
-    repeat_delay 120
-    repeat_rate 80
+    repeat_delay 200
+    repeat_rate 45
 }
 
 # Direct pointer feel: no acceleration curve, no compositor-side pointer scaling.
@@ -50,9 +50,7 @@ input type:pointer {
     pointer_accel 0
 }
 
-# Floating two-window layout. arch/bin/sway-workbench-layout computes sizes/positions
-# from the largest active output. Hold Mod and drag floating windows with the mouse:
-# left button moves, right button resizes.
+# Fullscreen two-workspace layout.
 floating_modifier $mod normal
 default_border pixel 1
 default_floating_border pixel 1
@@ -60,20 +58,25 @@ client.focused $gray $gray $black $fg $gray
 client.focused_inactive $gray $bg $gray $fg $gray
 client.unfocused $gray $black $gray $fg $gray
 client.urgent $red $red $fg $fg $red
-for_window [app_id="foot"] floating enable
-for_window [app_id="chromium"] floating enable
-for_window [class="Chromium"] floating enable
+assign [app_id="foot"] workspace number 1
+assign [app_id="chromium"] workspace number 2
+assign [class="Chromium"] workspace number 2
+for_window [app_id="foot"] fullscreen enable
+for_window [app_id="chromium"] fullscreen enable
+for_window [class="Chromium"] fullscreen enable
 
 # App-level controls live on Mod. Ctrl stays available for tmux/editor/browser content.
-bindsym $mod+Tab focus next
-bindsym $mod+Shift+Tab focus prev
+bindsym $mod+Tab workspace back_and_forth
+bindsym $mod+Shift+Tab workspace prev_on_output
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
 bindsym $mod+Shift+t exec $term
 bindsym $mod+Shift+g exec $browser
 bindsym $mod+Shift+f fullscreen toggle
 bindsym $mod+space floating toggle
 bindsym $mod+q kill
 bindsym $mod+r reload
-bindsym $mod+Shift+r exec sh -c '"$HOME/.local/bin/sway-workbench-layout"'
+bindsym $mod+Shift+r reload
 
 # Exit the whole local GUI session. Because arch/zshrc starts Sway with `exec`,
 # this returns to the TTY login prompt; Foot/Chromium close and tmux stays detached.

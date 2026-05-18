@@ -35,6 +35,7 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 bindkey -v '^?' backward-delete-char
+bindkey -v '^J' accept-line
 
 # Basic environment.
 export LANG=en_US.UTF-8
@@ -68,7 +69,7 @@ fi
 # System / desktop.
 alias yo='sudo pacman -Syu'
 alias refresh='source ~/.zshrc'
-alias gc='chromium'
+alias gc='chromium --ozone-platform=wayland --force-dark-mode --enable-features=WebUIDarkMode'
 alias bt='bluetoothctl'
 alias mute='pamixer -t'
 alias unmute='pamixer --unmute'

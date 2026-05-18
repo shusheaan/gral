@@ -18,11 +18,11 @@
 
 - 不装 Display Manager：开机只到 TTY，手动 `sway`，少一层 GUI login stack。
 - `arch/zshrc` 用 `exec /usr/bin/sway` 启动 GUI：退出 Sway 后直接回 TTY login prompt，不留下已解锁 shell。
-- Sway 单 workspace、无 bar block、无 swaybar、无壁纸、Gruvbox dark hard 背景、无桌面特效；状态放在 `tmux`，不让桌面层持续刷新。
+- Sway 只用两个主 workspace、无 bar block、无 swaybar、无壁纸、Gruvbox dark hard 背景、无桌面特效；状态放在 `tmux`，不让桌面层持续刷新。
 - Foot 是唯一 terminal，直接进入 `tmux new-session -A -s work`。
 - Chromium 是默认浏览器，走官方 pacman 包，不走 AUR；启动参数强制 Wayland 和 dark UI：`chromium --ozone-platform=wayland --force-dark-mode --enable-features=WebUIDarkMode`。
-- Keyboard repeat 已按激进交互调优：`repeat_delay 120`、`repeat_rate 80`。如果误触太多，再退回 `150/60`。
-- `Mod+Tab` 切 Foot/Chromium，`Mod+Shift+R` 一键恢复 1/9 默认布局，避免手工摆窗浪费时间。
+- Keyboard repeat 已降到更稳的交互值：`repeat_delay 200`、`repeat_rate 45`，避免按键重复触发太多。
+- `Mod+Tab` 在 Foot workspace 和 Chromium workspace 之间来回切换。
 - SSH 走常驻 `sshd.service`，不用 socket activation；远程连接第一下不等 systemd 临时拉起 daemon。
 
 装完后优先检查显示器最高刷新率。不要在 `sway/config` 里硬编码未知显示器；第一次进 Sway 后先看真实输出名和可用 mode：
@@ -45,12 +45,12 @@ output DP-1 mode 2560x1440@144Hz
 
 - `install.sh`：第一次重启后安装 `arch/packages.txt`，再 link Arch 配置。
 - `packages.txt`：首轮 pacman 包清单；避免在 `archinstall` 里手打长 list。
-- `sway/config`：单工作区 Foot + Chromium 配置；启动后调用 `bin/sway-workbench-layout` 按真实显示器尺寸摆放 floating 窗口，包含方向键/移动/resize、Gruvbox border、Gruvbox dark hard 背景、无 swaybar、音量/亮度通知。
+- `sway/config`：Foot + Chromium 两个 fullscreen workspace 配置；包含 workspace 切换、方向键 focus/move、Gruvbox border、Gruvbox dark hard 背景、无 swaybar、音量/亮度通知。
 - `foot/foot.ini`：Foot 终端配置；Gruvbox dark medium，与 `nvim/lua/plugins/colorscheme.lua` 保持一致。
 - `mako/config`：通知样式。
 - `environment.d/90-fcitx5.conf`：输入法环境变量。
 - `environment.d/91-whisper.conf`：本地 Whisper dictation 默认模型/任务配置。
-- `zshrc`、`tmux.conf`、`tmux-system-status.sh`、`bin/sway-workbench-layout`、`bin/audio-output`：Arch terminal / Sway workbench baseline。
+- `zshrc`、`tmux.conf`、`tmux-system-status.sh`、`bin/audio-output`：Arch terminal / Sway workbench baseline。
 - `ssh/config`：Arch outbound SSH client config，默认包含 GitHub，RunPod 留 template。
 - `systemd/logind.conf.d/10-gral-session.conf`：本地退出后保留 tmux、禁止自动 sleep 的 session policy。
 - repo root 共享：`nvim/`（含 `nvim/vimrc`）、`lf/`、`claude/`、`codex/`。
@@ -148,14 +148,14 @@ exit
 sway
 ```
 
-预期结果：第一次进入 Sway 会自动打开 Foot/tmux 和 Chromium，并按 1/9 对角错位布局摆好。
+预期结果：第一次进入 Sway 会自动打开 Foot/tmux 和 Chromium；Foot 在 workspace 1 fullscreen，Chromium 在 workspace 2 fullscreen，最后回到 workspace 1。
 
 ## 本地退出 / 远程继续跑任务
 
 目标行为：
 
 - 开机后只到 TTY login prompt。
-- `sway` 启动后自动打开 Foot/tmux 和 Chromium，并调用 `sway-workbench-layout` 按真实显示器尺寸摆好 floating 位置。
+- `sway` 启动后自动打开 Foot/tmux 和 Chromium，并把它们分别放到 workspace 1 和 workspace 2 fullscreen。
 - `Mod+Shift+Q` 退出整个 Sway session：Foot 和 Chromium 关闭，回到 TTY login prompt。
 - tmux server/session 保留；后台任务继续跑。
 - 手机或其他机器可以 SSH 回来；`arch/zshrc` 会自动 attach `work` tmux session，如果没有自动 attach，就手动：
@@ -577,7 +577,7 @@ CPU负载/CPU温度  GPU负载/GPU温度  内存用量  月-日 时:分
 
 ## Sway 配置
 
-实际配置只维护在 `arch/sway/config`。工作模型是一个 workspace，两个 floating app：Foot/tmux 与 Chromium；Sway 只负责启动、摆放、切换、移动/resize、音量/亮度通知；不启动 swaybar，不设置壁纸，背景固定为 Gruvbox dark hard，常驻状态放在 `tmux`。
+实际配置只维护在 `arch/sway/config`。工作模型是两个 fullscreen workspace：workspace 1 是 Foot/tmux，workspace 2 是 Chromium；Sway 只负责启动、分配 workspace、切换、音量/亮度通知；不启动 swaybar，不设置壁纸，背景固定为 Gruvbox dark hard，常驻状态放在 `tmux`。
 
 首次进入后检查真实 app id/class：
 
@@ -585,32 +585,21 @@ CPU负载/CPU温度  GPU负载/GPU温度  内存用量  月-日 时:分
 swaymsg -t get_tree | jq '.. | objects | select(.type? == "con") | {name, app_id, class}'
 ```
 
-窗口位置不是硬编码在 `for_window` 里，而是由 `~/.local/bin/sway-workbench-layout` 根据最大 active output 计算。布局是 1/9 对角错位 cascade：
-
-- Chromium：贴住屏幕左上角；右边和下边各留 `1/9` 屏幕空白，所以尺寸是 `8/9 width × 8/9 height`。
-- Foot/tmux：贴住屏幕右下角；左边和上边各留 `1/9` 屏幕空白，所以尺寸同样是 `8/9 width × 8/9 height`。
-- 两个窗口会重叠；脚本最后 focus Foot，让 terminal 在右下角作为前景，Chromium 从左上方露出。
-- 多显示器：默认选择面积最大的 active output，避免固定 `(0,0)` 坐标落到错误屏幕。
-
-
 核心操作：
 
-- `Mod+Tab` / `Mod+Shift+Tab`：在 Foot 和 Chromium 之间切换 focus。
-- 按住 `Mod` + 鼠标左键拖动：移动 floating window。
-- 按住 `Mod` + 鼠标右键拖动：调整 floating window 大小。
-- `Mod+Shift+R`：恢复默认 1/9 对角错位布局。
+- `Mod+Tab`：在 Foot 和 Chromium workspace 之间来回切换。
+- `Mod+Shift+Tab`：切到前一个 workspace。
+- `Mod+1` / `Mod+2`：直接切 Foot / Chromium。
+- `Mod+Shift+F`：切换当前窗口 fullscreen。
+- `Mod+Shift+R`：reload Sway config。
 - `Mod+Shift+Q`：退出整个 Sway session；Foot 和 Chromium 会关闭，tmux server/session 保留，屏幕回到 TTY login prompt。
 
-手动检查与重新套布局：
+手动检查：
 
 ```sh
 swaymsg -t get_outputs
 swaymsg -t get_tree | jq '.. | objects | select(.type? == "con") | {name, app_id, class}'
-sway-workbench-layout
-# 或在 Sway 里按 Mod+Shift+R
 ```
-
-如果想微调错开程度，改 `arch/bin/sway-workbench-layout` 里的 `gap_x="$((ow / 9))"` / `gap_y="$((oh / 9))"` 分母；改完后在 Sway 里按 `Mod+Shift+R` 即可验证，不需要重启。
 
 ## Mako 通知
 
@@ -816,7 +805,7 @@ sudo pacman -Rns chromium
 - [ ] Foot 使用 JetBrainsMono Nerd Font；颜色与 Nvim Gruvbox dark 一致；无透明背景。
 - [ ] Sway 自动打开 Foot/tmux + Chromium；`$mod+Tab` 在两个 app 间切换；没有 swaybar，背景为 Gruvbox dark hard，无壁纸。
 - [ ] `$mod+Shift+t` 打开 Foot/tmux；`$mod+Shift+g` 打开 Chromium。
-- [ ] `$mod+h/j/k/l` focus；`$mod+Shift+h/j/k/l` move；`$mod+Shift+r` 恢复 1/9 默认布局。
+- [ ] `$mod+h/j/k/l` focus；`$mod+Shift+h/j/k/l` move；`$mod+Shift+r` reload Sway config。
 - [ ] 音量/静音/亮度快捷键可用，并通过 Mako 弹出临时通知。
 - [ ] `fcitx5` 可输入中文；Chromium/Foot/Nvim 中都可用。
 - [ ] Bluetooth 鼠标/键盘/耳机/mic 可连接；`audio-output usb` / `audio-output bt` 可在 PipeWire 中切换输出。
